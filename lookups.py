@@ -1,7 +1,8 @@
 from enum import Enum
 
 class Errors(Enum):
-    pass
+    FETCHING_DATA_FROM_SOURCE = "Error fetching data from source"
+    READ_DATA_FN_ERROR = "Error processing results"
 
 class DataSources(Enum):
     SHELTER_SONOMA = "https://data.sonomacounty.ca.gov/resource/924a-vesw.json?$select=id,type,breed,color,sex,date_of_birth,intake_date,outcome_date,intake_type,outcome_type"

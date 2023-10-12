@@ -13,6 +13,9 @@ class Errors(Enum):
     ERROR_CONNECTING_TO_DB = "Error connecting to database"
     ERROR_CLOSING_CONN = "Error closing connection, check if session exists"
     ERROR_UNDEFINED_SOURCE = "This source is not a defined source in our datasets"
+    CLEAN_DALLAS_DF_ERROR = "Error doing pandas transformations on Dallas datasets"
+    CLEAN_BLOOMINGTON_DF_ERROR = "Error doing pandas transformations on Bloomington dataset"
+    CLEAN_NORFOLK_DF_ERROR = "Error doing pandas transformations on Norfolk dataset"
 
 class DataSources(Enum):
     SHELTER_SONOMA = "https://data.sonomacounty.ca.gov/resource/924a-vesw.json?$select=id,type,breed,color,sex,date_of_birth,intake_date,outcome_date,intake_type,outcome_type"

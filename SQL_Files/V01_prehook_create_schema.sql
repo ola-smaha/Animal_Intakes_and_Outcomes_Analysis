@@ -1,0 +1,1 @@
+CREATE SCHEMA IF NOT EXISTS target_schema;

@@ -19,6 +19,7 @@ class Errors(Enum):
     CLEAN_AUSTIN_DF_ERROR = "Error doing pandas transformations on Austin dataset"
     CLEAN_SONOMA_DF_ERROR = "Error doing pandas transformations on Sonoma dataset"
     CLEAN_ALL_DATA = "Error in: clean_all_data"
+    PREHOOK_SQL_ERROR = "Prehook error"
 
 class DataSources(Enum):
     SHELTER_SONOMA = "https://data.sonomacounty.ca.gov/resource/924a-vesw.json?$select=id,type,breed,color,sex,date_of_birth,intake_date,outcome_date,intake_type,outcome_type"
@@ -81,3 +82,14 @@ class InputTypes(Enum):
     CSV = "csv"
     SQL = "sql"
     TXT = "txt"
+
+class DestinationSchemaName(Enum):
+    Datawarehouse = 'dw_reporting_schema'
+
+class PreHookSteps(Enum):
+    EXECUTE_SQL_QUERIES = "Error in execute_sql_folder_prehook"
+    CREATE_SQL_STAGING = "Error in create_sql_staging_tables"
+    CREATE_TABLE_IDX = "Error in create_sql_stg_table_idx"
+
+class SQLCommandsPath(Enum):
+    SQL_FOLDER = "./SQL_Files/"

@@ -1,6 +1,6 @@
 import psycopg2
 from lookups import Errors, InputTypes
-from logging_handler import show_error_msg
+from logging_handler import log_error_msg
 import pandas as pd
 from datetime import time, datetime
 
@@ -25,7 +25,7 @@ def create_connection():
         )
         print('Connection was successful.')
     except Exception as e:
-        show_error_msg(Errors.ERROR_CONNECTING_TO_DB.value, str(e))
+        log_error_msg(Errors.ERROR_CONNECTING_TO_DB.value, str(e))
     finally:
         return db_session
 
@@ -37,7 +37,7 @@ def return_query(db_session,query):
         result = cursor.fetchall()
         db_session.commit()
     except Exception as e:
-        show_error_msg(Errors.DB_RETURN_QUERY_ERROR.value, str(e))
+        log_error_msg(Errors.DB_RETURN_QUERY_ERROR.value, str(e))
     finally:
         return result
 
@@ -58,7 +58,7 @@ def read_data_as_dataframe(file_type, file_path, db_session = None):
             error_prefix = Errors.RETURN_DF_SQL_ERROR.value
         else:
             error_prefix = Errors.UNDEFINED_ERROR.value
-        show_error_msg(error_prefix, error_suffix)
+        log_error_msg(error_prefix, error_suffix)
     finally:
         return return_dataframe
     
@@ -70,7 +70,7 @@ def execute_query(db_session, query):
         db_session.commit()
     except Exception as e:
         return_val = Errors.EXECUTE_QUERY_ERROR
-        show_error_msg(Errors.EXECUTE_QUERY_ERROR.value, str(e))
+        log_error_msg(Errors.EXECUTE_QUERY_ERROR.value, str(e))
     finally:
         if cursor:
             cursor.close()
@@ -91,7 +91,7 @@ def create_statement_from_df(df, schema_name, table_name):
         create_table_stmt += ", \n".join(cols)
         create_table_stmt += "\n);"
     except Exception as e:
-        show_error_msg(Errors.ERROR_CREATE_STMNT.value, str(e))
+        log_error_msg(Errors.ERROR_CREATE_STMNT.value, str(e))
     finally:
         return create_table_stmt
 
@@ -118,7 +118,7 @@ def insert_into_sql_statement_from_df(df, schema_name, table_name):
         values_str = ',\n'.join(values_list)
         insert_statement = f"INSERT INTO {schema_name}.{table_name} ({column_names}) VALUES\n{values_str};"
     except Exception as e:
-        show_error_msg(Errors.ERROR_INSERT_STMNT, str(e))
+        log_error_msg(Errors.ERROR_INSERT_STMNT, str(e))
     finally:
         return insert_statement
 
@@ -135,6 +135,6 @@ def close_connection(db_session):
         return_val = db_session.close()
         print("Connection is closed.")
     except Exception as e:
-        show_error_msg(Errors.ERROR_CLOSING_CONN.value,str(e))
+        log_error_msg(Errors.ERROR_CLOSING_CONN.value,str(e))
     finally:
         return return_val

@@ -4,8 +4,9 @@ import pandas as pd
 import numpy as np
 from io import StringIO
 from concurrent.futures import ThreadPoolExecutor
-from lookups import DataSources, Errors, StagingTablesNames
-from logging_handler import show_error_msg
+from lookups import DataSources, TransformationErrors, StagingTablesNames
+from logging_handler import log_error_msg
+import warnings
 
 # melting income datasets in python (might do this on SQL level instead, using UNION)
 # def readIncomeData():
@@ -36,26 +37,26 @@ def fetch_data(source, limit):
                 df.columns = ['date', source.name.split('_')[2].title()]
                 result = (source.name.lower(), df)          
         else:
-            raise Exception(f'{Errors.ERROR_STATUS_CODE.value}: {response.status_code}')
+            raise Exception(f'{TransformationErrors.ERROR_STATUS_CODE.value}: {response.status_code}')
     except requests.exceptions.RequestException as e:
-        show_error_msg(Errors.FETCHING_DATA_FROM_SOURCE.value + f" {source.name}", str(e))
+        log_error_msg(TransformationErrors.FETCHING_DATA_FROM_SOURCE.value + f" {source.name}", str(e))
     finally:
         return result
 # what does this error handling do? does it stop something specific?
 
 def readData(limit=1):
     income_dict = dict()
-    sources = list(DataSources)
-    with ThreadPoolExecutor(max_workers=5) as executor:
-        results = list(executor.map(lambda source: fetch_data(source, limit), sources))
     try:
-        for result in results:
-            if result is not None:
-                income_dict[result[0]] = result[1]
-            else:
-                print(f"{Errors.FETCHING_DATA_FROM_SOURCE.value}")
+        sources = list(DataSources)
+        with ThreadPoolExecutor(max_workers=5) as executor:
+            results = list(executor.map(lambda source: fetch_data(source, limit), sources))
+            for result in results:
+                if result is not None:
+                    income_dict[result[0]] = result[1]
+                else:
+                    print(f"{TransformationErrors.FETCHING_DATA_FROM_SOURCE.value}: a result is None.")
     except Exception as e:
-        show_error_msg(Errors.READ_DATA_FN_ERROR.value,str(e))
+        log_error_msg(TransformationErrors.READ_DATA_FN_ERROR.value,str(e))
     finally:
         return income_dict
 
@@ -77,7 +78,7 @@ def clean_sonoma_dataset(dfs):
         sonoma.loc[sonoma['outcome_type'] == 'Rtos', 'outcome_type'] = 'Return To Owner'
         sonoma['color'] = sonoma['color'].replace({'Bl ': 'Black ', 'Brn ' : 'Brown '},regex=True)
     except Exception as e:
-        show_error_msg(Errors.CLEAN_SONOMA_DF_ERROR.value,str(e))
+        log_error_msg(TransformationErrors.CLEAN_SONOMA_DF_ERROR.value,str(e))
     finally:
         return sonoma
 
@@ -106,7 +107,7 @@ def clean_austin_datasets(dfs):
         combined_df['region'] = 'Austin'
         combined_df.outcome_type.replace({'Relocate':'Transfer', 'Rto-Adopt': 'Return to Owner', 'Euthanasia':'Euthanize'},inplace=True)
     except Exception as e:
-        show_error_msg(Errors.CLEAN_AUSTIN_DF_ERROR.value,str(e))
+        log_error_msg(TransformationErrors.CLEAN_AUSTIN_DF_ERROR.value,str(e))
     finally:
         return combined_df
 
@@ -121,8 +122,9 @@ def clean_norfolk_dataset(dfs):
         norfolk['outcome_date'] =  pd.to_datetime(norfolk['outcome_date'])
         age_in_days = np.where(
             (~norfolk['years_old'].isna()) | (~norfolk['months_old'].isna()),
-            (norfolk['years_old'].fillna(0) * 12 + norfolk['months_old'].fillna(0)) * 30,
+            ((norfolk['years_old'].fillna(0) * 12 + norfolk['months_old'].fillna(0)) * 30),
             np.nan)
+        warnings.filterwarnings("ignore", category=RuntimeWarning, module="pandas.core.arrays.timedeltas")
         norfolk['date_of_birth'] = norfolk['intake_date'] - pd.to_timedelta(age_in_days, unit='D')
         norfolk.drop(['years_old','months_old'],axis=1, inplace=True)
         norfolk['date_of_birth'] =  pd.to_datetime(norfolk['date_of_birth'])
@@ -140,7 +142,7 @@ def clean_norfolk_dataset(dfs):
         norfolk['animal_id'] = norfolk['animal_id'].apply(lambda x: f'NOR-{x}')
         norfolk['region'] = 'Norfolk'
     except Exception as e:
-        show_error_msg(Errors.CLEAN_NORFOLK_DF_ERROR.value,str(e))
+        log_error_msg(TransformationErrors.CLEAN_NORFOLK_DF_ERROR.value,str(e))
     finally:
         return norfolk
 
@@ -184,7 +186,7 @@ def clean_bloomington_dataset(dfs):
         for value in values_to_replace:
             bloomington['intake_type'].replace(value, 'Owner Surrender', inplace=True)
     except Exception as e:
-        show_error_msg(Errors.CLEAN_BLOOMINGTON_DF_ERROR.value,str(e))
+        log_error_msg(TransformationErrors.CLEAN_BLOOMINGTON_DF_ERROR.value,str(e))
     finally:
         return bloomington
 
@@ -216,24 +218,27 @@ def clean_dallas_dataset(dfs):
         dallas['sex'] = dallas['color'] = None
         dallas['date_of_birth'] = pd.NaT
     except Exception as e:
-        show_error_msg(Errors.CLEAN_DALLAS_DF_ERROR.value,str(e))
+        log_error_msg(TransformationErrors.CLEAN_DALLAS_DF_ERROR.value,str(e))
     finally:
         return dallas
 
 def expand_dataframe(df):
-    df['date'] = pd.to_datetime(df['date'])
-    columns = df.columns
-    expanded_data = []
-    for i in range(len(df) - 1):
-        current_row = df.iloc[i]
-        next_row = df.iloc[i + 1]
-        growth_rate = (next_row[1] - current_row[1])
-        expanded_data.append([current_row[0], round(current_row[1], 3)])
-        current_date = current_row[0]
-        while current_date < next_row[0]:
-            current_date += pd.DateOffset(months=1)
-            expanded_data.append([current_date, round(expanded_data[-1][1] + growth_rate / 12, 3)])
-    expanded_df = pd.DataFrame(expanded_data, columns=columns)
+    try:
+        df['date'] = pd.to_datetime(df['date'])
+        columns = df.columns
+        expanded_data = []
+        for i in range(len(df) - 1):
+            current_row = df.iloc[i]
+            next_row = df.iloc[i + 1]
+            growth_rate = (next_row[1] - current_row[1])
+            expanded_data.append([current_row[0], round(current_row[1], 3)])
+            current_date = current_row[0]
+            while current_date < next_row[0]:
+                current_date += pd.DateOffset(months=1)
+                expanded_data.append([current_date, round(expanded_data[-1][1] + growth_rate / 12, 3)])
+        expanded_df = pd.DataFrame(expanded_data, columns=columns)
+    except Exception as e:
+        log_error_msg(TransformationErrors.EXPAND_DF.value,str(e))
     return expanded_df
 
 
@@ -252,7 +257,7 @@ def clean_all_data(limit):
                                 f"{StagingTablesNames.BLOOMINGTON_INTAKES_OUTCOMES.value}":bloomington,
                                 f"{StagingTablesNames.DALLAS_INTAKES_OUTCOMES.value}":dallas})
     except Exception as e:
-        show_error_msg(Errors.CLEAN_ALL_DATA.value,str(e))
+        log_error_msg(TransformationErrors.CLEAN_ALL_DATA.value,str(e))
     for key,value in dfs.items():
         try:
             if not key.startswith("shelter"): 
@@ -262,6 +267,6 @@ def clean_all_data(limit):
                 else:
                     clean_data_dict.update({key:value})  
         except Exception as e:
-            show_error_msg(f"{Errors.CLEAN_ALL_DATA.value}: Error at {key}", str(e))
+            log_error_msg(f"{TransformationErrors.CLEAN_ALL_DATA.value}: Error at {key}", str(e))
     return clean_data_dict
     

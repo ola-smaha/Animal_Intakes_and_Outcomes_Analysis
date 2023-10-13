@@ -1,9 +1,6 @@
 from enum import Enum
 
 class Errors(Enum):
-    FETCHING_DATA_FROM_SOURCE = "Error fetching data from source"
-    ERROR_STATUS_CODE = "Error: Received status code"
-    READ_DATA_FN_ERROR = "Error processing results"
     DB_RETURN_QUERY_ERROR = "DB Return Query Error"
     NO_ERROR = "No Errors"
     EXECUTE_QUERY_ERROR = "Error executing the query"
@@ -13,13 +10,18 @@ class Errors(Enum):
     ERROR_CONNECTING_TO_DB = "Error connecting to database"
     ERROR_CLOSING_CONN = "Error closing connection, check if session exists"
     ERROR_UNDEFINED_SOURCE = "This source is not a defined source in our datasets"
+    PREHOOK_SQL_ERROR = "Prehook error"
+
+class TransformationErrors(Enum):
+    FETCHING_DATA_FROM_SOURCE = "Error fetching data from source"
+    ERROR_STATUS_CODE = "Error: Received status code"
+    READ_DATA_FN_ERROR = "Error processing results"
     CLEAN_DALLAS_DF_ERROR = "Error doing pandas transformations on Dallas datasets"
     CLEAN_BLOOMINGTON_DF_ERROR = "Error doing pandas transformations on Bloomington dataset"
     CLEAN_NORFOLK_DF_ERROR = "Error doing pandas transformations on Norfolk dataset"
     CLEAN_AUSTIN_DF_ERROR = "Error doing pandas transformations on Austin dataset"
     CLEAN_SONOMA_DF_ERROR = "Error doing pandas transformations on Sonoma dataset"
     CLEAN_ALL_DATA = "Error in: clean_all_data"
-    PREHOOK_SQL_ERROR = "Prehook error"
 
 class DataSources(Enum):
     SHELTER_SONOMA = "https://data.sonomacounty.ca.gov/resource/924a-vesw.json?$select=id,type,breed,color,sex,date_of_birth,intake_date,outcome_date,intake_type,outcome_type"

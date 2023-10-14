@@ -1,11 +1,11 @@
 from database_handler import execute_query, create_statement_from_df, create_connection, close_connection
 from logging_handler import log_error_msg  
-from lookups import Errors, PreHookSteps, SQLCommandsPath, DestinationSchemaName
+from lookups import Errors, PreHookSteps, SQLCommandsPath, DataWareHouseSchema
 import os
 from transformation_handler import clean_all_data
 from misc_handler import get_sql_files_list
 
-def execute_sql_folder_prehook(db_session, target_schema = DestinationSchemaName.Datawarehouse, sql_commands_path = SQLCommandsPath.SQL_FOLDER):
+def execute_sql_folder_prehook(db_session, target_schema = DataWareHouseSchema.SCHEMA_NAME, sql_commands_path = SQLCommandsPath.SQL_FOLDER):
     sql_files = None
     try:
         sql_files = get_sql_files_list(sql_commands_path)
@@ -55,9 +55,9 @@ def execute_prehook(sql_commands_path = SQLCommandsPath.SQL_FOLDER):
         step = 1
         db_session = create_connection()
         step = 2
-        execute_sql_folder_prehook(db_session,DestinationSchemaName.Datawarehouse,sql_commands_path)
+        execute_sql_folder_prehook(db_session,DataWareHouseSchema.SCHEMA_NAME,sql_commands_path)
         step = 3
-        create_sql_staging_table(db_session,DestinationSchemaName.Datawarehouse)
+        create_sql_staging_table(db_session,DataWareHouseSchema.SCHEMA_NAME)
         step = 4
         close_connection(db_session)
     except Exception as e:

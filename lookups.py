@@ -11,6 +11,7 @@ class Errors(Enum):
     ERROR_CLOSING_CONN = "Error closing connection, check if session exists"
     ERROR_UNDEFINED_SOURCE = "This source is not a defined source in our datasets"
     PREHOOK_SQL_ERROR = "Prehook error"
+    HOOK_SQL_ERROR = "Hook error"
 
 class TransformationErrors(Enum):
     FETCHING_DATA_FROM_SOURCE = "Error fetching data from source"
@@ -22,6 +23,7 @@ class TransformationErrors(Enum):
     CLEAN_AUSTIN_DF_ERROR = "Error doing pandas transformations on Austin dataset"
     CLEAN_SONOMA_DF_ERROR = "Error doing pandas transformations on Sonoma dataset"
     CLEAN_ALL_DATA = "Error in: clean_all_data"
+    TRANSFORM_UNEMPLOYMENT_DATA = "Error transforming an 'unemployement' dataframe"
 
 class DataSources(Enum):
     SHELTER_SONOMA = "https://data.sonomacounty.ca.gov/resource/924a-vesw.json?$select=id,type,breed,color,sex,date_of_birth,intake_date,outcome_date,intake_type,outcome_type"
@@ -44,15 +46,15 @@ class DataSources(Enum):
         # Note: Norfolk city does not belong to a county, Bloomington is in Monroe county, link is for Monroe per capita income
     PER_CAPITA_DALLAS_INCOME = "https://fred.stlouisfed.org/graph/fredgraph.csv?bgcolor=%23e1e9f0&chart_type=line&drp=0&fo=open%20sans&graph_bgcolor=%23ffffff&height=450&mode=fred&recession_bars=on&txtcolor=%23444444&ts=12&tts=12&width=1138&nt=0&thu=0&trc=0&show_legend=yes&show_axis_titles=yes&show_tooltip=yes&id=PCPI48113&scale=left&cosd=2009-01-01&coed=2021-01-01&line_color=%234572a7&link_values=false&line_style=solid&mark_type=none&mw=3&lw=2&ost=-99999&oet=99999&mma=0&fml=a&fq=Annual&fam=avg&fgst=lin&fgsnd=2020-02-01&line_index=1&transformation=lin&vintage_date=2023-10-12&revision_date=2023-10-12&nd=1969-01-01"
     
-    # Population CSV download button links (using inspect)
-    POPULATION_SONOMA = "https://fred.stlouisfed.org/graph/fredgraph.csv?bgcolor=%23e1e9f0&chart_type=line&drp=0&fo=open%20sans&graph_bgcolor=%23ffffff&height=450&mode=fred&recession_bars=on&txtcolor=%23444444&ts=12&tts=12&width=1138&nt=0&thu=0&trc=0&show_legend=yes&show_axis_titles=yes&show_tooltip=yes&id=CASONO6POP&scale=left&cosd=2009-01-01&coed=2022-01-01&line_color=%234572a7&link_values=false&line_style=solid&mark_type=none&mw=3&lw=2&ost=-99999&oet=99999&mma=0&fml=a&fq=Annual&fam=avg&fgst=lin&fgsnd=2020-02-01&line_index=1&transformation=lin&vintage_date=2023-10-11&revision_date=2023-10-11&nd=1970-01-01"
-    POPULATION_AUSTIN = "https://fred.stlouisfed.org/graph/fredgraph.csv?bgcolor=%23e1e9f0&chart_type=line&drp=0&fo=open%20sans&graph_bgcolor=%23ffffff&height=450&mode=fred&recession_bars=on&txtcolor=%23444444&ts=12&tts=12&width=1138&nt=0&thu=0&trc=0&show_legend=yes&show_axis_titles=yes&show_tooltip=yes&id=TXAUST5POP&scale=left&cosd=2009-01-01&coed=2022-01-01&line_color=%234572a7&link_values=false&line_style=solid&mark_type=none&mw=3&lw=2&ost=-99999&oet=99999&mma=0&fml=a&fq=Annual&fam=avg&fgst=lin&fgsnd=2020-02-01&line_index=1&transformation=lin&vintage_date=2023-10-11&revision_date=2023-10-11&nd=1970-01-01"
-    POPULATION_NORFOLK_CITY = "https://fred.stlouisfed.org/graph/fredgraph.csv?bgcolor=%23e1e9f0&chart_type=line&drp=0&fo=open%20sans&graph_bgcolor=%23ffffff&height=450&mode=fred&recession_bars=on&txtcolor=%23444444&ts=12&tts=12&width=1138&nt=0&thu=0&trc=0&show_legend=yes&show_axis_titles=yes&show_tooltip=yes&id=VANORF5POP&scale=left&cosd=2009-01-01&coed=2022-01-01&line_color=%234572a7&link_values=false&line_style=solid&mark_type=none&mw=3&lw=2&ost=-99999&oet=99999&mma=0&fml=a&fq=Annual&fam=avg&fgst=lin&fgsnd=2020-02-01&line_index=1&transformation=lin&vintage_date=2023-10-11&revision_date=2023-10-11&nd=1970-01-01"
-    POPULATION_BLOOMINGTON_MONROE = "https://fred.stlouisfed.org/graph/fredgraph.csv?bgcolor=%23e1e9f0&chart_type=line&drp=0&fo=open%20sans&graph_bgcolor=%23ffffff&height=450&mode=fred&recession_bars=on&txtcolor=%23444444&ts=12&tts=12&width=1318&nt=0&thu=0&trc=0&show_legend=yes&show_axis_titles=yes&show_tooltip=yes&id=INMONR5POP&scale=left&cosd=2009-01-01&coed=2022-01-01&line_color=%234572a7&link_values=false&line_style=solid&mark_type=none&mw=3&lw=2&ost=-99999&oet=99999&mma=0&fml=a&fq=Annual&fam=avg&fgst=lin&fgsnd=2020-02-01&line_index=1&transformation=lin&vintage_date=2023-10-12&revision_date=2023-10-12&nd=1970-01-01"
-    POPULATION_DALLAS = "https://fred.stlouisfed.org/graph/fredgraph.csv?bgcolor=%23e1e9f0&chart_type=line&drp=0&fo=open%20sans&graph_bgcolor=%23ffffff&height=450&mode=fred&recession_bars=on&txtcolor=%23444444&ts=12&tts=12&width=1138&nt=0&thu=0&trc=0&show_legend=yes&show_axis_titles=yes&show_tooltip=yes&id=TXDALL3POP&scale=left&cosd=2009-01-01&coed=2022-01-01&line_color=%234572a7&link_values=false&line_style=solid&mark_type=none&mw=3&lw=2&ost=-99999&oet=99999&mma=0&fml=a&fq=Annual&fam=avg&fgst=lin&fgsnd=2020-02-01&line_index=1&transformation=lin&vintage_date=2023-10-11&revision_date=2023-10-11&nd=1970-01-01"
-    
+    # Population CSV download button links (using inspect) + links to webscrape
+    POPULATION_SONOMA = "https://fred.stlouisfed.org/graph/fredgraph.csv?bgcolor=%23e1e9f0&chart_type=line&drp=0&fo=open%20sans&graph_bgcolor=%23ffffff&height=450&mode=fred&recession_bars=on&txtcolor=%23444444&ts=12&tts=12&width=1318&nt=0&thu=0&trc=0&show_legend=yes&show_axis_titles=yes&show_tooltip=yes&id=CASONO6POP&scale=left&cosd=2009-01-01&coed=2022-01-01&line_color=%234572a7&link_values=false&line_style=solid&mark_type=none&mw=3&lw=2&ost=-99999&oet=99999&mma=0&fml=a&fq=Annual&fam=avg&fgst=lin&fgsnd=2020-02-01&line_index=1&transformation=lin&vintage_date=2023-10-13&revision_date=2023-10-13&nd=1970-01-01"
+    AUSTIN_POPULATION = "https://www.populationu.com/cities/austin-population"
+    NORFOLK_POPULATION = "https://www.populationu.com/cities/norfolk-va-population"
+    POPULATION_BLOOMINGTON_MONROE = "https://fred.stlouisfed.org/graph/fredgraph.csv?bgcolor=%23e1e9f0&chart_type=line&drp=0&fo=open%20sans&graph_bgcolor=%23ffffff&height=450&mode=fred&recession_bars=on&txtcolor=%23444444&ts=12&tts=12&width=1138&nt=0&thu=0&trc=0&show_legend=yes&show_axis_titles=yes&show_tooltip=yes&id=BLMPOP&scale=left&cosd=2009-01-01&coed=2022-01-01&line_color=%234572a7&link_values=false&line_style=solid&mark_type=none&mw=3&lw=2&ost=-99999&oet=99999&mma=0&fml=a&fq=Annual&fam=avg&fgst=lin&fgsnd=2020-02-01&line_index=1&transformation=lin&vintage_date=2023-10-13&revision_date=2023-10-13&nd=2000-01-01"
+    DALLAS_POPULATION = "https://www.populationu.com/cities/dallas-population"
+
     # Unemployment CSV download button links (using inspect)
-    UNEMPLOYMENT_RATE_SONOMA = "https://fred.stlouisfed.org/graph/fredgraph.csv?bgcolor=%23e1e9f0&chart_type=line&drp=0&fo=open%20sans&graph_bgcolor=%23ffffff&height=450&mode=fred&recession_bars=on&txtcolor=%23444444&ts=12&tts=12&width=1318&nt=0&thu=0&trc=0&show_legend=yes&show_axis_titles=yes&show_tooltip=yes&id=LAUCN060970000000003A&scale=left&cosd=2009-01-01&coed=2022-01-01&line_color=%234572a7&link_values=false&line_style=solid&mark_type=none&mw=3&lw=2&ost=-99999&oet=99999&mma=0&fml=a&fq=Annual&fam=avg&fgst=lin&fgsnd=2020-02-01&line_index=1&transformation=lin&vintage_date=2023-10-11&revision_date=2023-10-11&nd=1990-01-01"
+    UNEMPLOYMENT_RATE_SONOMA = "https://fred.stlouisfed.org/graph/fredgraph.csv?bgcolor=%23e1e9f0&chart_type=line&drp=0&fo=open%20sans&graph_bgcolor=%23ffffff&height=450&mode=fred&recession_bars=on&txtcolor=%23444444&ts=12&tts=12&width=718&nt=0&thu=0&trc=0&show_legend=yes&show_axis_titles=yes&show_tooltip=yes&id=CASONO6URN&scale=left&cosd=2009-01-01&coed=2023-08-01&line_color=%234572a7&link_values=false&line_style=solid&mark_type=none&mw=3&lw=2&ost=-99999&oet=99999&mma=0&fml=a&fq=Monthly&fam=avg&fgst=lin&fgsnd=2020-02-01&line_index=1&transformation=lin&vintage_date=2023-10-13&revision_date=2023-10-13&nd=1990-01-01"
     UNEMPLOYMENT_RATE_AUSTIN = "https://fred.stlouisfed.org/graph/fredgraph.csv?bgcolor=%23e1e9f0&chart_type=line&drp=0&fo=open%20sans&graph_bgcolor=%23ffffff&height=450&mode=fred&recession_bars=on&txtcolor=%23444444&ts=12&tts=12&width=1138&nt=0&thu=0&trc=0&show_legend=yes&show_axis_titles=yes&show_tooltip=yes&id=TXAUST5URN&scale=left&cosd=2009-01-01&coed=2023-08-01&line_color=%234572a7&link_values=false&line_style=solid&mark_type=none&mw=3&lw=2&ost=-99999&oet=99999&mma=0&fml=a&fq=Monthly&fam=avg&fgst=lin&fgsnd=2020-02-01&line_index=1&transformation=lin&vintage_date=2023-10-11&revision_date=2023-10-11&nd=1990-01-01"
     UNEMPLOYMENT_RATE_NORFOLK_CITY = "https://fred.stlouisfed.org/graph/fredgraph.csv?bgcolor=%23e1e9f0&chart_type=line&drp=0&fo=open%20sans&graph_bgcolor=%23ffffff&height=450&mode=fred&recession_bars=on&txtcolor=%23444444&ts=12&tts=12&width=1138&nt=0&thu=0&trc=0&show_legend=yes&show_axis_titles=yes&show_tooltip=yes&id=VANORF5URN&scale=left&cosd=2009-01-01&coed=2023-08-01&line_color=%234572a7&link_values=false&line_style=solid&mark_type=none&mw=3&lw=2&ost=-99999&oet=99999&mma=0&fml=a&fq=Monthly&fam=avg&fgst=lin&fgsnd=2020-02-01&line_index=1&transformation=lin&vintage_date=2023-10-11&revision_date=2023-10-11&nd=1990-01-01"
     UNEMPLOYMENT_RATE_BLOOMINGTON = "https://fred.stlouisfed.org/graph/fredgraph.csv?bgcolor=%23e1e9f0&chart_type=line&drp=0&fo=open%20sans&graph_bgcolor=%23ffffff&height=450&mode=fred&recession_bars=on&txtcolor=%23444444&ts=12&tts=12&width=1138&nt=0&thu=0&trc=0&show_legend=yes&show_axis_titles=yes&show_tooltip=yes&id=BLOO018URN&scale=left&cosd=2009-01-01&coed=2023-08-01&line_color=%234572a7&link_values=false&line_style=solid&mark_type=none&mw=3&lw=2&ost=-99999&oet=99999&mma=0&fml=a&fq=Monthly&fam=avg&fgst=lin&fgsnd=2020-02-01&line_index=1&transformation=lin&vintage_date=2023-10-11&revision_date=2023-10-11&nd=1990-01-01"
@@ -85,13 +87,24 @@ class InputTypes(Enum):
     SQL = "sql"
     TXT = "txt"
 
-class DestinationSchemaName(Enum):
-    Datawarehouse = 'dw_reporting_schema'
+class SQLCommandsPath(Enum):
+    SQL_FOLDER = "./SQL_Files/"
 
 class PreHookSteps(Enum):
     EXECUTE_SQL_QUERIES = "Error in execute_sql_folder_prehook"
     CREATE_SQL_STAGING = "Error in create_sql_staging_tables"
     CREATE_TABLE_IDX = "Error in create_sql_stg_table_idx"
 
-class SQLCommandsPath(Enum):
-    SQL_FOLDER = "./SQL_Files/"
+class HookSteps(Enum):
+    EXECUTE_SQL_QUERIES = "Error in execute_sql_folder_hook"
+    CREATE_ETL_CHECKPOINT = "create_etl_checkpoint"
+    INSERT_UPDATE_ETL_CHECKPOINT = "insert_or_update_etl_checkpoint"
+    RETURN_LAST_ETL_RUN = "return_etl_last_updated_date"
+    INSERT_INTO_STG_TABLE = "insert_into_stg_tables"
+class DataWareHouseSchema(Enum):
+    SCHEMA_NAME = "dw_reporting_schema"
+
+class ETL_Checkpoint(Enum):
+    TABLE = "etl_checkpoint"
+    COLUMN = "etl_last_run"
+    ETL_DEFAULT_DATE = "1900-10-08"

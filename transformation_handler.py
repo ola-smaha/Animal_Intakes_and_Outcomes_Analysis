@@ -7,6 +7,7 @@ from concurrent.futures import ThreadPoolExecutor
 from lookups import DataSources, TransformationErrors, StagingTablesNames
 from logging_handler import log_error_msg
 import warnings
+from bs4 import BeautifulSoup
 
 # melting income datasets in python (might do this on SQL level instead, using UNION)
 # def readIncomeData():
@@ -32,10 +33,13 @@ def fetch_data(source, limit):
                 df = pd.read_csv(StringIO(response.text))
                 df.columns = ['date', source.name.split('_')[1].title()]
                 result = (source.name.lower(), df)
-            else:
+            elif source.name.split('_')[1] == "POPULATION":
+                response = requests.get(source.value)
+                result = ('_'.join(source.name.split('_')[::-1]).lower(), BeautifulSoup(response.text,'lxml'))
+            elif source.name.startswith('PER_CAPITA') or source.name.startswith('UNEMPLOYMENT'):
                 df = pd.read_csv(StringIO(response.text))
                 df.columns = ['date', source.name.split('_')[2].title()]
-                result = (source.name.lower(), df)          
+                result = (source.name.lower(), df)         
         else:
             raise Exception(f'{TransformationErrors.ERROR_STATUS_CODE.value}: {response.status_code}')
     except requests.exceptions.RequestException as e:
@@ -44,6 +48,25 @@ def fetch_data(source, limit):
         return result
 # what does this error handling do? does it stop something specific?
 
+
+def web_scrape_data(soup):
+    table = soup.find_all('table')[0]
+    columns = table.find_all('th')
+    columns = [column.text.strip() for column in columns]
+    df = pd.DataFrame(columns=columns)
+    rows = table.find_all('tr')
+    for row in rows[1:]:
+        row_data = row.find_all('td')
+        single_row_data = [data.text.strip() for data in row_data]
+        length = len(df)
+        df.loc[length] = single_row_data
+    df.drop(df.columns[2], axis = 1, inplace=True)
+    df.iloc[:,0] = [i.replace('*','').strip() for i in df.iloc[:,0]]
+    df.iloc[:,1] = [i.replace(',','').strip() for i in df.iloc[:,1]]
+    df = df.astype(np.int64)
+    return df
+
+
 def readData(limit=1):
     income_dict = dict()
     try:
@@ -51,10 +74,15 @@ def readData(limit=1):
         with ThreadPoolExecutor(max_workers=5) as executor:
             results = list(executor.map(lambda source: fetch_data(source, limit), sources))
             for result in results:
-                if result is not None:
-                    income_dict[result[0]] = result[1]
+                if  result[1] is not None:
+                    if isinstance(result[1], pd.DataFrame):
+                        income_dict[result[0]] = result[1]
+                    elif isinstance(result[1], BeautifulSoup):
+                        df = web_scrape_data(result[1])
+                        df.columns = ['year', result[0].split('_')[1].title()]
+                        income_dict[result[0]] = df
                 else:
-                    print(f"{TransformationErrors.FETCHING_DATA_FROM_SOURCE.value}: a result is None.")
+                    print(f"{TransformationErrors.FETCHING_DATA_FROM_SOURCE.value}: a result df is None.")
     except Exception as e:
         log_error_msg(TransformationErrors.READ_DATA_FN_ERROR.value,str(e))
     finally:
@@ -77,6 +105,7 @@ def clean_sonoma_dataset(dfs):
         sonoma['region'] = 'Sonoma'
         sonoma.loc[sonoma['outcome_type'] == 'Rtos', 'outcome_type'] = 'Return To Owner'
         sonoma['color'] = sonoma['color'].replace({'Bl ': 'Black ', 'Brn ' : 'Brown '},regex=True)
+        sonoma.rename(columns = {'id':'animal_id'},inplace = True)
     except Exception as e:
         log_error_msg(TransformationErrors.CLEAN_SONOMA_DF_ERROR.value,str(e))
     finally:
@@ -222,25 +251,36 @@ def clean_dallas_dataset(dfs):
     finally:
         return dallas
 
-def expand_dataframe(df):
-    try:
-        df['date'] = pd.to_datetime(df['date'])
-        columns = df.columns
-        expanded_data = []
-        for i in range(len(df) - 1):
-            current_row = df.iloc[i]
-            next_row = df.iloc[i + 1]
-            growth_rate = (next_row[1] - current_row[1])
-            expanded_data.append([current_row[0], round(current_row[1], 3)])
-            current_date = current_row[0]
-            while current_date < next_row[0]:
-                current_date += pd.DateOffset(months=1)
-                expanded_data.append([current_date, round(expanded_data[-1][1] + growth_rate / 12, 3)])
-        expanded_df = pd.DataFrame(expanded_data, columns=columns)
-    except Exception as e:
-        log_error_msg(TransformationErrors.EXPAND_DF.value,str(e))
-    return expanded_df
+# def expand_dataframe(df):
+#     try:
+#         df['date'] = pd.to_datetime(df['date'])
+#         columns = df.columns
+#         expanded_data = []
+#         for i in range(len(df) - 1):
+#             current_row = df.iloc[i]
+#             next_row = df.iloc[i + 1]
+#             growth_rate = (next_row[1] - current_row[1])
+#             expanded_data.append([current_row[0], round(current_row[1], 3)])
+#             current_date = current_row[0]
+#             while current_date < next_row[0]:
+#                 current_date += pd.DateOffset(months=1)
+#                 expanded_data.append([current_date, round(expanded_data[-1][1] + growth_rate / 12, 3)])
+#         expanded_df = pd.DataFrame(expanded_data, columns=columns)
+#     except Exception as e:
+#         log_error_msg(TransformationErrors.EXPAND_DF.value,str(e))
+#     return expanded_df
 
+def transform_unemployment_data(df):
+    try:
+        if 'date' in df:
+            df['date'] = pd.to_datetime(df['date'])
+            df['year'] = df['date'].dt.year
+        annual_unemployment_df = df.groupby('year')[df.columns[1]].mean().reset_index()
+    except Exception as e:
+        log_error_msg(TransformationErrors.TRANSFORM_UNEMPLOYMENT_DATA.value, str(e))
+    finally:
+        return annual_unemployment_df
+    
 
 def clean_all_data(limit):
     dfs = readData(limit)
@@ -251,22 +291,29 @@ def clean_all_data(limit):
         norfolk = clean_norfolk_dataset(dfs)
         bloomington = clean_bloomington_dataset(dfs)
         dallas = clean_dallas_dataset(dfs)
+        intakes_dfs = [sonoma,austin,norfolk,bloomington,dallas]
+        columns = ['type', 'breed', 'color', 'intake_type', 'sex', 'outcome_type']
+        for df in intakes_dfs:
+            df[columns] = df[columns].astype(str)
         clean_data_dict.update({f"{StagingTablesNames.SONOMA_INTAKES_OUTCOMES.value}":sonoma,
                                 f"{StagingTablesNames.AUSTIN_INTAKES_OUTCOMES.value}":austin,
                                 f"{StagingTablesNames.NORFOLK_INTAKES_OUTCOMES.value}":norfolk,
                                 f"{StagingTablesNames.BLOOMINGTON_INTAKES_OUTCOMES.value}":bloomington,
                                 f"{StagingTablesNames.DALLAS_INTAKES_OUTCOMES.value}":dallas})
-    except Exception as e:
-        log_error_msg(TransformationErrors.CLEAN_ALL_DATA.value,str(e))
-    for key,value in dfs.items():
-        try:
-            if not key.startswith("shelter"): 
-                if len(value)<30: # sufficiently big enough (30 years)
-                    expanded_df = expand_dataframe(value)
-                    clean_data_dict.update({key:expanded_df})
+        for key,value in dfs.items():
+            if key.startswith("unemployment"): 
+                    annual_df = transform_unemployment_data(value)
+                    clean_data_dict.update({key:annual_df})
+            elif key.startswith("population") or key.startswith("per_capita"):
+                if value.columns[0] == 'date':
+                    value['date'] = pd.to_datetime(value['date'])
+                    value['date'] = value['date'].dt.year
+                    value.rename(columns={'date':'year'}, inplace = True)
+                    clean_data_dict.update({key:value})
                 else:
-                    clean_data_dict.update({key:value})  
-        except Exception as e:
-            log_error_msg(f"{TransformationErrors.CLEAN_ALL_DATA.value}: Error at {key}", str(e))
-    return clean_data_dict
+                    clean_data_dict.update({key:value})
+    except Exception as e:
+            log_error_msg(TransformationErrors.CLEAN_ALL_DATA.value, str(e))
+    finally:
+        return clean_data_dict
     

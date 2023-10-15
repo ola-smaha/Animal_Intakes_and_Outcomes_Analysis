@@ -3,7 +3,8 @@ from logging_handler import log_error_msg
 from lookups import Errors, HookSteps, DataWareHouseSchema, SQLCommandsPath, ETL_Checkpoint
 from misc_handler import get_sql_files_list
 import os
-import transformation_handler
+from transformation_handler import readData, clean_all_data
+import datetime
 
 def execute_sql_folder_hook(db_session, target_schema = DataWareHouseSchema.SCHEMA_NAME, sql_commands_path = SQLCommandsPath.SQL_FOLDER):
     sql_files = None
@@ -78,3 +79,37 @@ def return_etl_last_updated_date(db_session,
         return return_date, etl_time_exists
     
 
+def insert_data_into_stg_tables(db_session, etl_date, target_schema = DataWareHouseSchema.SCHEMA_NAME):
+    try:
+        source_dfs_dict = readData(etl_date = etl_date.strftime("%Y-%m-%dT%H:%M:%S.%f"), limit=10000000)
+        stg_dfs_dict = clean_all_data(source_dfs_dict)
+        for df_name,stg_df in stg_dfs_dict.items():
+            if len(stg_df) > 0:
+                insert_stmt = insert_into_sql_statement_from_df(stg_df, target_schema.value, 'stg_'+df_name)
+                execute_return = execute_query(db_session=db_session, query= insert_stmt)
+                if execute_return != Errors.NO_ERROR:
+                    raise Exception(f"{HookSteps.INSERT_INTO_STG_TABLE.value}: error executing insert_stmt.")
+    except Exception as e:
+        log_error_msg(HookSteps.INSERT_INTO_STG_TABLE.value, str(e))
+
+
+def execute_hook():
+    step = None
+    try:
+        step = 1
+        db_session = create_connection()
+        step = 2
+        create_etl_checkpoint(DataWareHouseSchema.SCHEMA_NAME, db_session)
+        step = 3
+        etl_date, etl_time_exists = return_etl_last_updated_date(db_session)
+        step = 4
+        insert_data_into_stg_tables(db_session=db_session,target_schema=DataWareHouseSchema.SCHEMA_NAME, etl_date=etl_date)
+        step = 5
+        execute_sql_folder_hook(db_session)
+        step = 6
+        insert_or_update_etl_checkpoint(db_session, etl_time_exists=etl_time_exists)
+        step = 7
+        close_connection(db_session)
+    except Exception as e:
+        error_prefix = f'{Errors.HOOK_SQL_ERROR.value} on step {step}'
+        log_error_msg(error_prefix,str(e))

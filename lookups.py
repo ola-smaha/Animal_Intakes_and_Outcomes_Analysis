@@ -17,11 +17,11 @@ class TransformationErrors(Enum):
     FETCHING_DATA_FROM_SOURCE = "Error fetching data from source"
     ERROR_STATUS_CODE = "Error: Received status code"
     READ_DATA_FN_ERROR = "Error processing results"
-    CLEAN_DALLAS_DF_ERROR = "Error doing pandas transformations on Dallas datasets"
-    CLEAN_BLOOMINGTON_DF_ERROR = "Error doing pandas transformations on Bloomington dataset"
-    CLEAN_NORFOLK_DF_ERROR = "Error doing pandas transformations on Norfolk dataset"
-    CLEAN_AUSTIN_DF_ERROR = "Error doing pandas transformations on Austin dataset"
-    CLEAN_SONOMA_DF_ERROR = "Error doing pandas transformations on Sonoma dataset"
+    CLEAN_DALLAS_DF_ERROR = "Error doing pandas transformations on Dallas shelter datasets"
+    CLEAN_BLOOMINGTON_DF_ERROR = "Error doing pandas transformations on Bloomington shelter dataset"
+    CLEAN_NORFOLK_DF_ERROR = "Error doing pandas transformations on Norfolk shelter dataset"
+    CLEAN_AUSTIN_DF_ERROR = "Error doing pandas transformations on Austin shelter dataset"
+    CLEAN_SONOMA_DF_ERROR = "Error doing pandas transformations on Sonoma shelter dataset"
     CLEAN_ALL_DATA = "Error in: clean_all_data"
     TRANSFORM_UNEMPLOYMENT_DATA = "Error transforming an 'unemployement' dataframe"
 
@@ -101,6 +101,7 @@ class HookSteps(Enum):
     INSERT_UPDATE_ETL_CHECKPOINT = "insert_or_update_etl_checkpoint"
     RETURN_LAST_ETL_RUN = "return_etl_last_updated_date"
     INSERT_INTO_STG_TABLE = "insert_into_stg_tables"
+    
 class DataWareHouseSchema(Enum):
     SCHEMA_NAME = "dw_reporting_schema"
 
@@ -108,3 +109,8 @@ class ETL_Checkpoint(Enum):
     TABLE = "etl_checkpoint"
     COLUMN = "etl_last_run"
     ETL_DEFAULT_DATE = "1900-10-08"
+
+class DateCondition(Enum):
+    AUSTIN = "datetime>0"
+    BLOOMINGTON_INTAKES = "intakedate>0 or movementdate>0"
+    OTHER = "intake_date>0 or outcome_date>0"

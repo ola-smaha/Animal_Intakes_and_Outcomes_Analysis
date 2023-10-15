@@ -2,8 +2,9 @@ from database_handler import execute_query, create_statement_from_df, create_con
 from logging_handler import log_error_msg  
 from lookups import Errors, PreHookSteps, SQLCommandsPath, DataWareHouseSchema
 import os
-from transformation_handler import clean_all_data
+from transformation_handler import clean_all_data, readData
 from misc_handler import get_sql_files_list
+import datetime
 
 def execute_sql_folder_prehook(db_session, target_schema = DataWareHouseSchema.SCHEMA_NAME, sql_commands_path = SQLCommandsPath.SQL_FOLDER):
     sql_files = None
@@ -33,7 +34,8 @@ def create_sql_stg_table_idx(db_session,source_name,table_name,index_val):
 def create_sql_staging_table(db_session, target_schema):
     create_stmt = None
     try:
-        source_dfs = clean_all_data(limit=1)
+        dfs = readData(etl_date=None,limit=1)
+        source_dfs = clean_all_data(dfs)
         if len(source_dfs) == 0:
             raise Exception("No DataFrame returned by clean_all_data")
         for stg_name, stg_df in source_dfs.items():

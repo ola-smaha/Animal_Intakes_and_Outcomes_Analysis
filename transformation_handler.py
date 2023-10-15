@@ -4,7 +4,7 @@ import pandas as pd
 import numpy as np
 from io import StringIO
 from concurrent.futures import ThreadPoolExecutor
-from lookups import DataSources, TransformationErrors, StagingTablesNames
+from lookups import DataSources, TransformationErrors, StagingTablesNames, DateCondition
 from logging_handler import log_error_msg
 import warnings
 from bs4 import BeautifulSoup
@@ -22,31 +22,37 @@ from bs4 import BeautifulSoup
 #                 df[item.name.split('_')[2].title()] = pd.read_csv(StringIO(response.text)).iloc[:,[1]]
 #     return pd.melt(df, id_vars=['date'], var_name='region', value_name='personal_income')
 
-def fetch_data(source, limit):
+def fetch_data(source, limit, etl_date):
     result = None
+    condition = None
     try:
-        response = requests.get(source.value, params={'$limit': limit})
-        if response.status_code == 200:
-            if source.name.startswith("SHELTER"):
-                result = (source.name.lower(), pd.DataFrame(response.json()))
-            elif source.name.startswith("POPULATION"):
-                df = pd.read_csv(StringIO(response.text))
-                df.columns = ['date', source.name.split('_')[1].title()]
-                result = (source.name.lower(), df)
-            elif source.name.split('_')[1] == "POPULATION":
-                response = requests.get(source.value)
-                result = ('_'.join(source.name.split('_')[::-1]).lower(), BeautifulSoup(response.text,'lxml'))
-            elif source.name.startswith('PER_CAPITA') or source.name.startswith('UNEMPLOYMENT'):
-                df = pd.read_csv(StringIO(response.text))
-                df.columns = ['date', source.name.split('_')[2].title()]
-                result = (source.name.lower(), df)         
-        else:
-            raise Exception(f'{TransformationErrors.ERROR_STATUS_CODE.value}: {response.status_code}')
-    except requests.exceptions.RequestException as e:
-        log_error_msg(TransformationErrors.FETCHING_DATA_FROM_SOURCE.value + f" {source.name}", str(e))
+        if source.name.startswith("SHELTER"):
+            if etl_date != None:
+                if source.name.startswith('SHELTER_AUSTIN'):
+                    condition = DateCondition.AUSTIN.value.replace('0',f"'{etl_date}'")
+                elif source == DataSources.SHELTER_BLOOMINGTON:
+                    condition = DateCondition.BLOOMINGTON_INTAKES.value.replace('0',f"'{etl_date}'")
+                elif source in [DataSources.SHELTER_SONOMA,DataSources.SHELTER_NORFOLK] or source.name.startswith("SHELTER_DALLAS"):
+                    condition = DateCondition.OTHER.value.replace('0',f"'{etl_date}'")
+            response = requests.get(source.value, params={'$limit': limit, '$where':condition})
+            result = (source.name.lower(), pd.DataFrame(response.json()))
+        elif source.name.startswith("POPULATION"):
+            response = requests.get(source.value)
+            df = pd.read_csv(StringIO(response.text))
+            df.columns = ['date', source.name.split('_')[1].title()]
+            result = (source.name.lower(), df)
+        elif source.name.split('_')[1] == "POPULATION":
+            response = requests.get(source.value)
+            result = ('_'.join(source.name.split('_')[::-1]).lower(), BeautifulSoup(response.text,'lxml'))
+        elif source.name.startswith('PER_CAPITA') or source.name.startswith('UNEMPLOYMENT'):
+            response = requests.get(source.value)
+            df = pd.read_csv(StringIO(response.text))
+            df.columns = ['date', source.name.split('_')[2].title()]
+            result = (source.name.lower(), df)         
+    except Exception as e:
+        log_error_msg(TransformationErrors.FETCHING_DATA_FROM_SOURCE.value, str(e))
     finally:
         return result
-# what does this error handling do? does it stop something specific?
 
 
 def web_scrape_data(soup):
@@ -67,12 +73,12 @@ def web_scrape_data(soup):
     return df
 
 
-def readData(limit=1):
+def readData(etl_date = None, limit = None):
     income_dict = dict()
     try:
         sources = list(DataSources)
         with ThreadPoolExecutor(max_workers=5) as executor:
-            results = list(executor.map(lambda source: fetch_data(source, limit), sources))
+            results = list(executor.map(lambda source: fetch_data(source, limit, etl_date), sources))
             for result in results:
                 if  result[1] is not None:
                     if isinstance(result[1], pd.DataFrame):
@@ -282,8 +288,7 @@ def transform_unemployment_data(df):
         return annual_unemployment_df
     
 
-def clean_all_data(limit):
-    dfs = readData(limit)
+def clean_all_data(dfs):
     clean_data_dict = {}
     try:
         sonoma = clean_sonoma_dataset(dfs)
@@ -292,9 +297,11 @@ def clean_all_data(limit):
         bloomington = clean_bloomington_dataset(dfs)
         dallas = clean_dallas_dataset(dfs)
         intakes_dfs = [sonoma,austin,norfolk,bloomington,dallas]
-        columns = ['type', 'breed', 'color', 'intake_type', 'sex', 'outcome_type']
+        object_columns = ['type', 'breed', 'color', 'intake_type', 'sex', 'outcome_type']
+        date_columns = ['date_of_birth','intake_date','outcome_date']
         for df in intakes_dfs:
-            df[columns] = df[columns].astype(str)
+            df[object_columns] = df[object_columns].astype(str)
+            df[date_columns] = df[date_columns].fillna('2262-04-11').astype('datetime64[ns]')
         clean_data_dict.update({f"{StagingTablesNames.SONOMA_INTAKES_OUTCOMES.value}":sonoma,
                                 f"{StagingTablesNames.AUSTIN_INTAKES_OUTCOMES.value}":austin,
                                 f"{StagingTablesNames.NORFOLK_INTAKES_OUTCOMES.value}":norfolk,

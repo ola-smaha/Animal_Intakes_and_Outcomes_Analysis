@@ -22,6 +22,16 @@ from bs4 import BeautifulSoup
 #                 df[item.name.split('_')[2].title()] = pd.read_csv(StringIO(response.text)).iloc[:,[1]]
 #     return pd.melt(df, id_vars=['date'], var_name='region', value_name='personal_income')
 
+def get_data_columns(sources):
+    shelter_sources = [source for source in sources if source.name.startswith('SHELTER')]
+    data = {}
+    for source in shelter_sources:
+        response = requests.get(source.value,params={'$limit': 1})
+        result = (source.name.lower(), pd.DataFrame(response.json()))
+        columns = result[1].columns
+        data[result[0]] = columns.tolist()
+    return data
+
 def fetch_data(source, limit, etl_date):
     result = None
     condition = None
@@ -36,6 +46,9 @@ def fetch_data(source, limit, etl_date):
                     condition = DateCondition.OTHER.value.replace('0',f"'{etl_date}'")
             response = requests.get(source.value, params={'$limit': limit, '$where':condition})
             result = (source.name.lower(), pd.DataFrame(response.json()))
+            if result[1].empty:
+                column_names_dict = get_data_columns(DataSources)
+                result = (result[0], pd.DataFrame(columns=column_names_dict[result[0]]))
         elif source.name.startswith("POPULATION"):
             response = requests.get(source.value)
             df = pd.read_csv(StringIO(response.text))
@@ -73,7 +86,7 @@ def web_scrape_data(soup):
     return df
 
 
-def readData(etl_date = None, limit = None):
+def readData(etl_date = None, limit = None): 
     income_dict = dict()
     try:
         sources = list(DataSources)
@@ -88,7 +101,7 @@ def readData(etl_date = None, limit = None):
                         df.columns = ['year', result[0].split('_')[1].title()]
                         income_dict[result[0]] = df
                 else:
-                    print(f"{TransformationErrors.FETCHING_DATA_FROM_SOURCE.value}: a result df is None.")
+                    raise Exception(f"{TransformationErrors.FETCHING_DATA_FROM_SOURCE.value}: a result df is None.")
     except Exception as e:
         log_error_msg(TransformationErrors.READ_DATA_FN_ERROR.value,str(e))
     finally:

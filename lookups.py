@@ -66,21 +66,7 @@ class StagingTablesNames(Enum):
     NORFOLK_INTAKES_OUTCOMES = "intakes_outcomes_norfolk"
     BLOOMINGTON_INTAKES_OUTCOMES = "intakes_outcomes_bloomington"
     DALLAS_INTAKES_OUTCOMES = "intakes_outcomes_dallas"
-    PER_CAPITA_SONOMA_INCOME = "PER_CAPITA_SONOMA_INCOME"
-    PER_CAPITA_AUSTIN_INCOME = "per_capita_austin_income"
-    PER_CAPITA_NORFOLK_INCOME = "per_capita_norfolk_income"
-    PER_CAPITA_BLOOMINGTON_INCOME = "per_capita_bloomington_income"
-    PER_CAPITA_DALLAS_INCOME = "per_capita_dallas_income"
-    POPULATION_SONOMA = "population_sonoma"
-    POPULATION_AUSTIN = "population_austin"
-    POPULATION_NORFOLK_CITY = "population_norfolk_city"
-    POPULATION_BLOOMINGTON = "population_bloomington"
-    POPULATION_DALLAS = "population_dallas"
-    UNEMPLOYMENT_RATE_SONOMA = "unemployment_rate_sonoma"
-    UNEMPLOYMENT_RATE_AUSTIN = "unemployment_rate_austin"
-    UNEMPLOYMENT_RATE_NORFOLK_CITY = "unemployment_rate_norfolk_city"
-    UNEMPLOYMENT_RATE_BLOOMINGTON = "unemployment_rate_bloomington"
-    UNEMPLOYMENT_RATE_DALLAS = "unemployment_rate_dallas"
+
 
 class InputTypes(Enum):
     CSV = "csv"

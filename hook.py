@@ -69,7 +69,7 @@ def return_etl_last_updated_date(db_session,
         query = f"SELECT {column_name.value} FROM {target_schema.value}.{table_name.value} ORDER BY {column_name.value} DESC LIMIT 1"
         etl_df = read_data_as_dataframe(file_type = InputTypes.SQL, file_path = query, db_session= db_session)
         if len(etl_df) == 0:
-            return_date = etl_date.value
+            return_date = pd.to_datetime(etl_date.value)
         else:
             return_date = etl_df[column_name.value].iloc[0]
             etl_time_exists = True

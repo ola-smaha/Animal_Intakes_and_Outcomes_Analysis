@@ -2,8 +2,11 @@ CREATE TABLE IF NOT EXISTS target_schema.dim_per_capita_income (
     income_id INT PRIMARY KEY,
     year INT,
     region VARCHAR(50),
-    income INT
+    income INT,
+    CONSTRAINT unique_year_region_income
+	UNIQUE (year, region)
 );
+CREATE INDEX IF NOT EXISTS idx_income ON target_schema.dim_per_capita_income (income_id);
 
 WITH CTE_BLOOMINGTON_INCOME AS (
     SELECT
@@ -11,7 +14,7 @@ WITH CTE_BLOOMINGTON_INCOME AS (
         income_bloomington.year AS year,
         'Bloomington' AS region,
         income_bloomington.bloomington AS income
-    FROM target_schema.stg_per_capita_bloomington_monroe_income AS income_bloomington
+    FROM target_schema.stg_per_capita_bloomington_in_msa_income AS income_bloomington
 ),
 CTE_AUSTIN_INCOME AS (
     SELECT
@@ -56,4 +59,7 @@ UNION
 SELECT * FROM CTE_NORFOLK_INCOME
 UNION 
 SELECT * FROM CTE_SONOMA_INCOME
-ORDER BY income_id;
+ORDER BY income_id
+ON CONFLICT (year, region) DO UPDATE
+SET
+    income = EXCLUDED.income

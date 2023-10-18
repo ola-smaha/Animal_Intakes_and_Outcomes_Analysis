@@ -12,6 +12,8 @@ class Errors(Enum):
     ERROR_UNDEFINED_SOURCE = "This source is not a defined source in our datasets"
     PREHOOK_SQL_ERROR = "Prehook error"
     HOOK_SQL_ERROR = "Hook error"
+    POSTHOOK_TRUNCATE_ERROR = "Error truncating staging table"
+    EXECUTE_POSTHOOK_ERROR = "Error executing execute_posthook function"
 
 class TransformationErrors(Enum):
     FETCHING_DATA_FROM_SOURCE = "Error fetching data from source"
@@ -59,13 +61,34 @@ class DataSources(Enum):
     UNEMPLOYMENT_RATE_BLOOMINGTON = "https://fred.stlouisfed.org/graph/fredgraph.csv?bgcolor=%23e1e9f0&chart_type=line&drp=0&fo=open%20sans&graph_bgcolor=%23ffffff&height=450&mode=fred&recession_bars=on&txtcolor=%23444444&ts=12&tts=12&width=1138&nt=0&thu=0&trc=0&show_legend=yes&show_axis_titles=yes&show_tooltip=yes&id=BLOO018URN&scale=left&cosd=2009-01-01&coed=2023-08-01&line_color=%234572a7&link_values=false&line_style=solid&mark_type=none&mw=3&lw=2&ost=-99999&oet=99999&mma=0&fml=a&fq=Monthly&fam=avg&fgst=lin&fgsnd=2020-02-01&line_index=1&transformation=lin&vintage_date=2023-10-11&revision_date=2023-10-11&nd=1990-01-01"
     UNEMPLOYMENT_RATE_DALLAS = "https://fred.stlouisfed.org/graph/fredgraph.csv?bgcolor=%23e1e9f0&chart_type=line&drp=0&fo=open%20sans&graph_bgcolor=%23ffffff&height=450&mode=fred&recession_bars=on&txtcolor=%23444444&ts=12&tts=12&width=1138&nt=0&thu=0&trc=0&show_legend=yes&show_axis_titles=yes&show_tooltip=yes&id=TXDALL3URN&scale=left&cosd=2009-01-01&coed=2023-08-01&line_color=%234572a7&link_values=false&line_style=solid&mark_type=none&mw=3&lw=2&ost=-99999&oet=99999&mma=0&fml=a&fq=Monthly&fam=avg&fgst=lin&fgsnd=2020-02-01&line_index=1&transformation=lin&vintage_date=2023-10-11&revision_date=2023-10-11&nd=1990-01-01"
 
-class StagingTablesNames(Enum):
+class IntakesOutcomesTablesNames(Enum):
     SONOMA_INTAKES_OUTCOMES = "intakes_outcomes_sonoma"
     AUSTIN_INTAKES_OUTCOMES = "intakes_outcomes_austin"
     NORFOLK_INTAKES_OUTCOMES = "intakes_outcomes_norfolk"
     BLOOMINGTON_INTAKES_OUTCOMES = "intakes_outcomes_bloomington"
     DALLAS_INTAKES_OUTCOMES = "intakes_outcomes_dallas"
 
+class StagingTablesNames(Enum):
+    STG_SONOMA_INTAKES_OUTCOMES = "stg_intakes_outcomes_sonoma"
+    STG_AUSTIN_INTAKES_OUTCOMES = "stg_intakes_outcomes_austin"
+    STG_NORFOLK_INTAKES_OUTCOMES = "stg_intakes_outcomes_norfolk"
+    STG_BLOOMINGTON_INTAKES_OUTCOMES = "stg_intakes_outcomes_bloomington"
+    STG_DALLAS_INTAKES_OUTCOMES = "stg_intakes_outcomes_dallas"
+    STG_PER_CAPITA_SONOMA_INCOME = "stg_per_capita_sonoma_income"
+    STG_PER_CAPITA_AUSTIN_INCOME = "stg_per_capita_austin_income"
+    STG_PER_CAPITA_NORFOLK_INCOME = "stg_per_capita_norfolk_income"
+    STG_PER_CAPITA_BLOOMINGTON_INCOME = "stg_per_capita_bloomington_in_msa_income"
+    STG_PER_CAPITA_DALLAS_INCOME = "stg_per_capita_dallas_income"
+    STG_POPULATION_SONOMA = "stg_population_sonoma"
+    STG_POPULATION_AUSTIN = "stg_population_austin"
+    STG_POPULATION_NORFOLK_CITY = "stg_population_norfolk"
+    STG_POPULATION_BLOOMINGTON = "stg_population_bloomington_monroe"
+    STG_POPULATION_DALLAS = "stg_population_dallas"
+    STG_UNEMPLOYMENT_RATE_SONOMA = "stg_unemployment_rate_sonoma"
+    STG_UNEMPLOYMENT_RATE_AUSTIN = "stg_unemployment_rate_austin"
+    STG_UNEMPLOYMENT_RATE_NORFOLK_CITY = "stg_unemployment_rate_norfolk_city"
+    STG_UNEMPLOYMENT_RATE_BLOOMINGTON = "stg_unemployment_rate_bloomington"
+    STG_UNEMPLOYMENT_RATE_DALLAS = "stg_unemployment_rate_dallas"
 
 class InputTypes(Enum):
     CSV = "csv"

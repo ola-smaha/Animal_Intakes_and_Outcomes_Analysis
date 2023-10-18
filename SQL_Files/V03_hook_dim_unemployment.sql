@@ -2,8 +2,11 @@ CREATE TABLE IF NOT EXISTS target_schema.dim_unemployment (
     unemployment_id INT PRIMARY KEY,
     year INT,
     region VARCHAR(50),
-    unemployment_rate NUMERIC
+    unemployment_rate NUMERIC,
+    CONSTRAINT unique_year_region_unemployment
+	UNIQUE (year, region)
 );
+CREATE INDEX IF NOT EXISTS idx_unemployment ON target_schema.dim_unemployment (unemployment_id);
 
 WITH CTE_BLOOMINGTON_UNEMPLOYMENT AS (
     SELECT
@@ -11,7 +14,7 @@ WITH CTE_BLOOMINGTON_UNEMPLOYMENT AS (
         unemployment_bloomington.year AS year,
         'Bloomington' AS region,
         ROUND(CAST(unemployment_bloomington.bloomington AS NUMERIC),2) AS unemployment_rate
-    FROM target_schema.stg_unemployment_rate_bloomington AS unemployment_bloomington
+    FROM target_schema.stg_per_capita_bloomington_in_msa_income AS unemployment_bloomington
 ),
 CTE_AUSTIN_UNEMPLOYMENT AS (
     SELECT
@@ -56,4 +59,7 @@ UNION
 SELECT * FROM CTE_NORFOLK_UNEMPLOYMENT
 UNION 
 SELECT * FROM CTE_SONOMA_UNEMPLOYMENT
-ORDER BY unemployment_id;
+ORDER BY unemployment_id
+ON CONFLICT (year, region) DO UPDATE
+SET
+    unemployment_rate = EXCLUDED.unemployment_rate

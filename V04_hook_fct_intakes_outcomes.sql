@@ -18,7 +18,7 @@ CREATE TABLE IF NOT EXISTS target_schema.fct_intakes_outcomes
 	CONSTRAINT unique_animal_intake_outcome
 	UNIQUE (animal_id, intake_date, intake_type, outcome_date, outcome_type)
 );
-CREATE INDEX idx_intakes_outcomes ON target_schema.fct_intakes_outcomes (intake_outcome_id);
+CREATE INDEX IF NOT EXISTS idx_intakes_outcomes ON target_schema.fct_intakes_outcomes (intake_outcome_id);
 WITH CTE_COMBINED_DATA AS
 (
 	SELECT animal_id, type, breed, color, sex, date_of_birth, intake_date, intake_type, outcome_date, outcome_type, region

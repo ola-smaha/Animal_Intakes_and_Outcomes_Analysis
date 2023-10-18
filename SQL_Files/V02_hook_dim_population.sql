@@ -2,16 +2,18 @@ CREATE TABLE IF NOT EXISTS target_schema.dim_population (
     population_id INT PRIMARY KEY,
     year INT,
     region VARCHAR(50),
-    population INT
+    population INT,
+    CONSTRAINT unique_year_region_population
+	UNIQUE (year, region)
 );
-
+CREATE INDEX IF NOT EXISTS idx_population ON target_schema.dim_population (population_id);
 WITH CTE_BLOOMINGTON_POPULATION AS (
     SELECT
         ROW_NUMBER() OVER () AS population_id,
         population_bloomington.year AS year,
         'Bloomington' AS region,
         population_bloomington.bloomington * 1000 AS population
-    FROM target_schema.stg_population_bloomington_monroe AS population_bloomington
+    FROM target_schema.stg_per_capita_bloomington_in_msa_income AS population_bloomington
 ),
 CTE_AUSTIN_POPULATION AS (
     SELECT
@@ -56,4 +58,7 @@ UNION
 SELECT * FROM CTE_NORFOLK_POPULATION
 UNION 
 SELECT * FROM CTE_SONOMA_POPULATION
-ORDER BY population_id;
+ORDER BY population_id
+ON CONFLICT (year,region) DO UPDATE
+SET
+    population = EXCLUDED.population

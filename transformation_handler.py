@@ -4,23 +4,10 @@ import pandas as pd
 import numpy as np
 from io import StringIO
 from concurrent.futures import ThreadPoolExecutor
-from lookups import DataSources, TransformationErrors, StagingTablesNames, DateCondition
+from lookups import DataSources, TransformationErrors, IntakesOutcomesTablesNames, DateCondition
 from logging_handler import log_error_msg
 import warnings
 from bs4 import BeautifulSoup
-
-# melting income datasets in python (might do this on SQL level instead, using UNION)
-# def readIncomeData():
-#     df = pd.DataFrame()
-#     for item in DataSourcesIncome:
-#         response = requests.get(item.value)
-#         if response.status_code == 200:
-#             if item.name == DataSourcesIncome.PER_CAPITA_SONOMA_INCOME.name:
-#                 df = pd.concat([df,pd.read_csv(StringIO(response.text))])
-#                 df.columns = ['date','Sonoma']
-#             else:
-#                 df[item.name.split('_')[2].title()] = pd.read_csv(StringIO(response.text)).iloc[:,[1]]
-#     return pd.melt(df, id_vars=['date'], var_name='region', value_name='personal_income')
 
 def get_data_columns(sources):
     shelter_sources = [source for source in sources if source.name.startswith('SHELTER')]
@@ -272,25 +259,6 @@ def clean_dallas_dataset(dfs):
     finally:
         return dallas
 
-# def expand_dataframe(df):
-#     try:
-#         df['date'] = pd.to_datetime(df['date'])
-#         columns = df.columns
-#         expanded_data = []
-#         for i in range(len(df) - 1):
-#             current_row = df.iloc[i]
-#             next_row = df.iloc[i + 1]
-#             growth_rate = (next_row[1] - current_row[1])
-#             expanded_data.append([current_row[0], round(current_row[1], 3)])
-#             current_date = current_row[0]
-#             while current_date < next_row[0]:
-#                 current_date += pd.DateOffset(months=1)
-#                 expanded_data.append([current_date, round(expanded_data[-1][1] + growth_rate / 12, 3)])
-#         expanded_df = pd.DataFrame(expanded_data, columns=columns)
-#     except Exception as e:
-#         log_error_msg(TransformationErrors.EXPAND_DF.value,str(e))
-#     return expanded_df
-
 def transform_unemployment_data(df):
     try:
         if 'date' in df:
@@ -317,11 +285,11 @@ def clean_all_data(dfs):
         for df in intakes_dfs:
             df[object_columns] = df[object_columns].astype(str)
             df[date_columns] = df[date_columns].fillna('2262-04-11').astype('datetime64[ns]')
-        clean_data_dict.update({f"{StagingTablesNames.SONOMA_INTAKES_OUTCOMES.value}":sonoma,
-                                f"{StagingTablesNames.AUSTIN_INTAKES_OUTCOMES.value}":austin,
-                                f"{StagingTablesNames.NORFOLK_INTAKES_OUTCOMES.value}":norfolk,
-                                f"{StagingTablesNames.BLOOMINGTON_INTAKES_OUTCOMES.value}":bloomington,
-                                f"{StagingTablesNames.DALLAS_INTAKES_OUTCOMES.value}":dallas})
+        clean_data_dict.update({f"{IntakesOutcomesTablesNames.SONOMA_INTAKES_OUTCOMES.value}":sonoma,
+                                f"{IntakesOutcomesTablesNames.AUSTIN_INTAKES_OUTCOMES.value}":austin,
+                                f"{IntakesOutcomesTablesNames.NORFOLK_INTAKES_OUTCOMES.value}":norfolk,
+                                f"{IntakesOutcomesTablesNames.BLOOMINGTON_INTAKES_OUTCOMES.value}":bloomington,
+                                f"{IntakesOutcomesTablesNames.DALLAS_INTAKES_OUTCOMES.value}":dallas})
         for key,value in dfs.items():
             if key.startswith("unemployment"): 
                     annual_df = transform_unemployment_data(value)

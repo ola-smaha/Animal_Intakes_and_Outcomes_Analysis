@@ -1,5 +1,5 @@
-CREATE TABLE target_schema.dim_per_capita_income (
-    income_id INT,
+CREATE TABLE IF NOT EXISTS target_schema.dim_per_capita_income (
+    income_id INT PRIMARY KEY,
     year INT,
     region VARCHAR(50),
     income INT

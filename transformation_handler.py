@@ -174,6 +174,7 @@ def clean_norfolk_dataset(dfs):
             np.nan)
         warnings.filterwarnings("ignore", category=RuntimeWarning, module="pandas.core.arrays.timedeltas")
         norfolk['date_of_birth'] = norfolk['intake_date'] - pd.to_timedelta(age_in_days, unit='D')
+        norfolk['date_of_birth'] = norfolk.groupby('animal_id')['date_of_birth'].transform('first')
         norfolk.drop(['years_old','months_old'],axis=1, inplace=True)
         norfolk['date_of_birth'] =  pd.to_datetime(norfolk['date_of_birth'])
         norfolk.rename(columns={'animal_type':'type','primary_breed': 'breed', 'primary_color':'color'},inplace=True)
@@ -219,6 +220,7 @@ def clean_bloomington_dataset(dfs):
         bloomington['intake_date'] =  pd.to_datetime(bloomington['intake_date'])
         bloomington['outcome_date'] =  pd.to_datetime(bloomington['outcome_date'])
         bloomington.drop_duplicates(inplace=True)
+        bloomington.drop_duplicates(subset=['id','intake_date'],keep='first',inplace = True)
         bloomington['age_in_days'] = bloomington['animalage'].apply(age_to_days)
         bloomington = bloomington[~(bloomington['age_in_days'] == 355385)]
         bloomington.loc[:, 'date_of_birth'] = bloomington['intake_date'] - pd.to_timedelta(bloomington['age_in_days'], unit='D')

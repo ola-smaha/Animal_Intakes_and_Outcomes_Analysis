@@ -1,5 +1,5 @@
-CREATE TABLE target_schema.dim_population (
-    population_id INT,
+CREATE TABLE IF NOT EXISTS target_schema.dim_population (
+    population_id INT PRIMARY KEY,
     year INT,
     region VARCHAR(50),
     population INT

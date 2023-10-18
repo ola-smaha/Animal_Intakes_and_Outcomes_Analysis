@@ -1,5 +1,5 @@
-CREATE TABLE target_schema.dim_unemployment (
-    unemployment_id INT,
+CREATE TABLE IF NOT EXISTS target_schema.dim_unemployment (
+    unemployment_id INT PRIMARY KEY,
     year INT,
     region VARCHAR(50),
     unemployment_rate NUMERIC

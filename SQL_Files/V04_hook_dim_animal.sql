@@ -1,9 +1,9 @@
 CREATE TABLE IF NOT EXISTS target_schema.dim_animal
 (
 	animal_id TEXT PRIMARY KEY,
-	sex TEXT,
 	type TEXT,
-	dob TEXT
+	sex TEXT,
+	dob TIMESTAMP
 );
 CREATE INDEX IF NOT EXISTS idx_animal ON target_schema.dim_animal (animal_id);
 
@@ -25,9 +25,6 @@ WITH CTE_COMBINED_DATA AS
 	FROM target_schema.stg_intakes_outcomes_sonoma
 )
 INSERT INTO target_schema.dim_animal
-SELECT *
+SELECT DISTINCT *
 FROM CTE_COMBINED_DATA
-ON CONFLICT (animal_id) DO UPDATE
-SET
-	sex = EXCLUDED.sex
-	
+ON CONFLICT (animal_id) DO NOTHING

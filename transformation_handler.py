@@ -8,6 +8,7 @@ from lookups import DataSources, TransformationErrors, IntakesOutcomesTablesName
 from logging_handler import log_error_msg
 import warnings
 from bs4 import BeautifulSoup
+import json
 
 def get_data_columns(sources):
     shelter_sources = [source for source in sources if source.name.startswith('SHELTER')]
@@ -137,6 +138,7 @@ def clean_austin_datasets(dfs):
         combined_df = pd.merge(austin_in, austin_out, on='animal_id', how = 'left')
         combined_df['outcome_type'] = combined_df['outcome_type'].fillna('Pending')
         combined_df['sex'].replace({'NULL': 'Unknown', 'Intact Male': 'Male', 'Intact Female': 'Female', 'Neutered Male': 'Neutered', 'Spayed Female': 'Spayed'}, inplace=True)
+        combined_df['sex'].fillna('Unknown',inplace=True)
         combined_df['type'] = np.where(~combined_df['type'].isin(['Cat', 'Dog']), 'Other', combined_df['type'])
         combined_df['animal_id'] = combined_df['animal_id'].apply(lambda x: f'AUS-{x}')
         combined_df['region'] = 'Austin'
@@ -209,7 +211,7 @@ def clean_bloomington_dataset(dfs):
         bloomington.drop_duplicates(inplace=True)
         bloomington.drop_duplicates(subset=['id','intake_date'],keep='first',inplace = True)
         bloomington['age_in_days'] = bloomington['animalage'].apply(age_to_days)
-        bloomington = bloomington[~(bloomington['age_in_days'] == 355385)]
+        bloomington = bloomington[~(bloomington['age_in_days'] >= 130000)]
         bloomington.loc[:, 'date_of_birth'] = bloomington['intake_date'] - pd.to_timedelta(bloomington['age_in_days'], unit='D')
         bloomington.drop(['animalage','age_in_days'],axis=1, inplace=True)
         bloomington.reset_index(drop=True, inplace=True)
@@ -252,7 +254,8 @@ def clean_dallas_dataset(dfs):
         dallas.reset_index(drop=True, inplace=True)
         dallas['animal_id'] = dallas['animal_id'].apply(lambda x: f'DAL-{x}')
         dallas['region'] = 'Dallas'
-        dallas['sex'] = dallas['color'] = None
+        dallas['sex'] = 'Unknown'
+        dallas['color'] = None
         dallas['date_of_birth'] = pd.NaT
     except Exception as e:
         log_error_msg(TransformationErrors.CLEAN_DALLAS_DF_ERROR.value,str(e))
@@ -271,6 +274,16 @@ def transform_unemployment_data(df):
         return annual_unemployment_df
     
 
+def edit_type(df,ai_list,animal_type):
+    lst = []
+    for animal in df.loc[df['type'] == 'Other']['breed'].tolist():
+        for animal_ai in ai_list:
+            if animal_ai in animal and animal not in lst:
+                lst.append(animal)
+    for breed in lst:
+        df.loc[df['breed'] == breed, 'type'] = animal_type
+
+
 def clean_all_data(dfs):
     clean_data_dict = {}
     try:
@@ -279,17 +292,32 @@ def clean_all_data(dfs):
         norfolk = clean_norfolk_dataset(dfs)
         bloomington = clean_bloomington_dataset(dfs)
         dallas = clean_dallas_dataset(dfs)
-        intakes_dfs = [sonoma,austin,norfolk,bloomington,dallas]
+
+        intakes_dfs = [sonoma, austin, norfolk, bloomington, dallas]
+
         object_columns = ['type', 'breed', 'color', 'intake_type', 'sex', 'outcome_type']
         date_columns = ['date_of_birth','intake_date','outcome_date']
         for df in intakes_dfs:
             df[object_columns] = df[object_columns].astype(str)
             df[date_columns] = df[date_columns].fillna('2262-04-11').astype('datetime64[ns]')
+            df['breed'] = df['breed'].replace({' Sh |Short Hair': 'Shorthair',' Mh ':'Medium Hair',' Lh |Long Hair':'Longhair'},regex=True)
+        
+        with open("openai_animal_types.json", "r") as json_file:
+            data = json.load(json_file)
+        birds_list = data['bird'].split(', ')
+        birds_list = [i.title() for i in birds_list]
+        livestock_list = data['livestock'].split(', ')
+        livestock_list = [i.title() for i in livestock_list]
+        for df in intakes_dfs:
+            edit_type(df,birds_list,'Bird')
+            edit_type(df,livestock_list,'Livestock')
+
         clean_data_dict.update({f"{IntakesOutcomesTablesNames.SONOMA_INTAKES_OUTCOMES.value}":sonoma,
                                 f"{IntakesOutcomesTablesNames.AUSTIN_INTAKES_OUTCOMES.value}":austin,
                                 f"{IntakesOutcomesTablesNames.NORFOLK_INTAKES_OUTCOMES.value}":norfolk,
                                 f"{IntakesOutcomesTablesNames.BLOOMINGTON_INTAKES_OUTCOMES.value}":bloomington,
                                 f"{IntakesOutcomesTablesNames.DALLAS_INTAKES_OUTCOMES.value}":dallas})
+        
         for key,value in dfs.items():
             if key.startswith("unemployment"): 
                     annual_df = transform_unemployment_data(value)
@@ -302,6 +330,8 @@ def clean_all_data(dfs):
                     clean_data_dict.update({key:value})
                 else:
                     clean_data_dict.update({key:value})
+            else:
+                pass
     except Exception as e:
             log_error_msg(TransformationErrors.CLEAN_ALL_DATA.value, str(e))
     finally:

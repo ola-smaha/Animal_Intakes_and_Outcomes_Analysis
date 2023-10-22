@@ -25,7 +25,7 @@ def execute_sql_folder_prehook(db_session, target_schema = DataWareHouseSchema.S
 
 def create_sql_stg_table_idx(db_session,source_name,table_name,index_val):
     try:
-        query = f"CREATE INDEX IF NOT EXISTS IF NOT EXISTS idx_{table_name} ON {source_name}.{table_name} ({index_val});"
+        query = f"CREATE INDEX IF NOT EXISTS idx_{table_name} ON {source_name}.{table_name} ({index_val});"
         execute_query(db_session,query)
     except Exception as e:
         log_error_msg(PreHookSteps.CREATE_TABLE_IDX.value, str(e))

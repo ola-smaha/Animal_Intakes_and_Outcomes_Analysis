@@ -75,7 +75,7 @@ def web_scrape_data(soup):
 
 
 def readData(etl_date = None, limit = None): 
-    income_dict = dict()
+    data_dict = dict()
     try:
         sources = list(DataSources)
         with ThreadPoolExecutor(max_workers=5) as executor:
@@ -83,17 +83,17 @@ def readData(etl_date = None, limit = None):
             for result in results:
                 if  result[1] is not None:
                     if isinstance(result[1], pd.DataFrame):
-                        income_dict[result[0]] = result[1]
+                        data_dict[result[0]] = result[1]
                     elif isinstance(result[1], BeautifulSoup):
                         df = web_scrape_data(result[1])
                         df.columns = ['year', result[0].split('_')[1].title()]
-                        income_dict[result[0]] = df
+                        data_dict[result[0]] = df
                 else:
                     raise Exception(f"{TransformationErrors.FETCHING_DATA_FROM_SOURCE.value}: a result df is None.")
     except Exception as e:
         log_error_msg(TransformationErrors.READ_DATA_FN_ERROR.value,str(e))
     finally:
-        return income_dict
+        return data_dict
 
 
 def clean_sonoma_dataset(dfs):
@@ -113,6 +113,7 @@ def clean_sonoma_dataset(dfs):
         sonoma.loc[sonoma['outcome_type'] == 'Rtos', 'outcome_type'] = 'Return To Owner'
         sonoma['color'] = sonoma['color'].replace({'Bl ': 'Black ', 'Brn ' : 'Brown '},regex=True)
         sonoma.rename(columns = {'id':'animal_id'},inplace = True)
+        sonoma.intake_type.replace({'Born Here':'Born in Shelter', 'Os Appt': 'Owner Surrender'},inplace=True)
     except Exception as e:
         log_error_msg(TransformationErrors.CLEAN_SONOMA_DF_ERROR.value,str(e))
     finally:
@@ -143,6 +144,7 @@ def clean_austin_datasets(dfs):
         combined_df['animal_id'] = combined_df['animal_id'].apply(lambda x: f'AUS-{x}')
         combined_df['region'] = 'Austin'
         combined_df.outcome_type.replace({'Relocate':'Transfer', 'Rto-Adopt': 'Return to Owner', 'Euthanasia':'Euthanize'},inplace=True)
+        combined_df.intake_type.replace({'Public Assist':'Owner Surrender'},inplace = True)
     except Exception as e:
         log_error_msg(TransformationErrors.CLEAN_AUSTIN_DF_ERROR.value,str(e))
     finally:
@@ -174,7 +176,7 @@ def clean_norfolk_dataset(dfs):
         norfolk['color'] = norfolk['color'].replace({'Bl |Blk ': 'Black ', 'Brn |Br ' : 'Brown ', 'Org':'Orange', 'Sl ':'Silver '},regex=True)
         norfolk['sex'].replace({'NULL': 'Unknown', 'Intact Male': 'Male', 'Intact Female': 'Female', 'Neutered Male': 'Neutered', 'Spayed Female': 'Spayed'}, inplace=True)
         norfolk.reset_index(drop=True, inplace=True)
-        norfolk.intake_type.replace({'Owner Surrendered':'Owner Surrender','Confiscated':'Confiscate'},inplace=True)
+        norfolk.intake_type.replace({'Owner Surrendered':'Owner Surrender','Confiscated':'Confiscate', 'Return':'Adoption Return', 'Temporary':'Foster'},inplace=True)
         norfolk['outcome_type'] = norfolk['outcome_type'].fillna('Pending')
         norfolk.outcome_type.replace({'Euthanized':'Euthanize','Disposal of Deceased Pet':'Disposal','Unassisted Death':'Died'},inplace=True)
         norfolk['animal_id'] = norfolk['animal_id'].apply(lambda x: f'NOR-{x}')
@@ -219,7 +221,9 @@ def clean_bloomington_dataset(dfs):
         bloomington['region'] = 'Bloomington'
         bloomington.loc[~bloomington['type'].isin(['Cat', 'Dog', 'Bird', 'Livestock','Other']), 'breed'] = bloomington['type']
         bloomington['type'] = np.where(~bloomington['type'].isin(['Cat', 'Dog']), 'Other', bloomington['type'])
-        bloomington['intake_type'].replace({'Transfer from Other Shelter':'Transfer','Abuse/ neglect':'Confiscate', 'Owner requested Euthanasia':'Euthanasia Request','DOA':'Disposal Request of Deceased Pet'},inplace = True)
+        bloomington['intake_type'].replace({'Transfer from Other Shelter':'Transfer','Abuse/ neglect':'Confiscate','Police Assist':'Confiscate', 'Owner requested Euthanasia':'Euthanasia Request',
+                                            'DOA':'Disposal Request of Deceased Pet','Injured Wildlife': 'Wildlife', 'Owner Deceased': 'Owner Died',
+                                            'Return Adopt - Behavior': 'Behavioral Issues', 'Return adopt - lifestyle issue':'Incompatible with owner lifetsyle'},inplace = True)
         bloomington['outcome_type'].replace({'Reclaimed':'Return to Owner','Released To Wild':'Returned to Native Habitat','None':'Pending'},inplace = True)
         values_to_replace = ['Incompatible with owner Lifestyle', 'Moving', 'Unsuitable Accommodation', 'Unable to Afford', 'Allergies', 'Incompatible with other pets', 'Marriage/Relationship split']
         for value in values_to_replace:
@@ -249,7 +253,7 @@ def clean_dallas_dataset(dfs):
         data_columns = ['type','breed','intake_type','outcome_type']
         dallas[data_columns] = dallas[data_columns].apply(lambda x: x.str.title())
         dallas['type'] = np.where(~dallas['type'].isin(['Cat', 'Dog']), 'Other', dallas['type'])
-        dallas['intake_type'].replace({'Confiscated':'Confiscate'},inplace = True)
+        dallas['intake_type'].replace({'Confiscated':'Confiscate', 'Dispos Req':'Disposal Request of Deceased Pet', 'Dispos Req':'Confiscate', 'Keepsafe':'Foster','Treatment':'Sick/Injured'},inplace = True)
         dallas['outcome_type'].replace({'Euthanized':'Euthanize','Returned To Owner':'Return To Owner','Dead On Arrival':'Disposal'},inplace = True)
         dallas.reset_index(drop=True, inplace=True)
         dallas['animal_id'] = dallas['animal_id'].apply(lambda x: f'DAL-{x}')
@@ -257,6 +261,7 @@ def clean_dallas_dataset(dfs):
         dallas['sex'] = 'Unknown'
         dallas['color'] = None
         dallas['date_of_birth'] = pd.NaT
+        dallas.intake_type.replace({'Dispos Req':'Confiscate'},inplace=True)
     except Exception as e:
         log_error_msg(TransformationErrors.CLEAN_DALLAS_DF_ERROR.value,str(e))
     finally:
@@ -274,7 +279,7 @@ def transform_unemployment_data(df):
         return annual_unemployment_df
     
 
-def edit_type(df,ai_list,animal_type):
+def edit_animal_type(df,ai_list,animal_type):
     lst = []
     for animal in df.loc[df['type'] == 'Other']['breed'].tolist():
         for animal_ai in ai_list:
@@ -299,8 +304,10 @@ def clean_all_data(dfs):
         date_columns = ['date_of_birth','intake_date','outcome_date']
         for df in intakes_dfs:
             df[object_columns] = df[object_columns].astype(str)
-            df[date_columns] = df[date_columns].fillna('2262-04-11').astype('datetime64[ns]')
-            df['breed'] = df['breed'].replace({' Sh |Short Hair': 'Shorthair',' Mh ':'Medium Hair',' Lh |Long Hair':'Longhair'},regex=True)
+            df[date_columns] = df[date_columns].fillna('1700-01-01').astype('datetime64[ns]')
+            df['breed'] = df['breed'].replace({'Short Hair|Shorthair': 'Sh','Medium Hair|Mediumhair':'Mh','Long Hair|Longhair':'Lh'},regex=True)
+            df.dropna(subset=['intake_type'], inplace=True)
+            df.drop(df[df['outcome_date'] < df['intake_date']].index, inplace=True)
         
         with open("openai_animal_types.json", "r") as json_file:
             data = json.load(json_file)
@@ -309,8 +316,8 @@ def clean_all_data(dfs):
         livestock_list = data['livestock'].split(', ')
         livestock_list = [i.title() for i in livestock_list]
         for df in intakes_dfs:
-            edit_type(df,birds_list,'Bird')
-            edit_type(df,livestock_list,'Livestock')
+            edit_animal_type(df,birds_list,'Bird')
+            edit_animal_type(df,livestock_list,'Livestock')
 
         clean_data_dict.update({f"{IntakesOutcomesTablesNames.SONOMA_INTAKES_OUTCOMES.value}":sonoma,
                                 f"{IntakesOutcomesTablesNames.AUSTIN_INTAKES_OUTCOMES.value}":austin,

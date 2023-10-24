@@ -13,7 +13,7 @@ WITH CTE_BLOOMINGTON_UNEMPLOYMENT AS (
         unemployment_bloomington.year AS year,
         'Bloomington' AS region,
         ROUND(CAST(unemployment_bloomington.bloomington AS NUMERIC),2) AS unemployment_rate
-    FROM target_schema.stg_per_capita_bloomington_in_msa_income AS unemployment_bloomington
+    FROM target_schema.stg_unemployment_rate_bloomington AS unemployment_bloomington
 ),
 CTE_AUSTIN_UNEMPLOYMENT AS (
     SELECT DISTINCT

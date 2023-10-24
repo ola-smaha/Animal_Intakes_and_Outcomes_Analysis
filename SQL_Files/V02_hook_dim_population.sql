@@ -12,7 +12,7 @@ WITH CTE_BLOOMINGTON_POPULATION AS (
         population_bloomington.year AS year,
         'Bloomington' AS region,
         population_bloomington.bloomington * 1000 AS population
-    FROM target_schema.stg_per_capita_bloomington_in_msa_income AS population_bloomington
+    FROM target_schema.stg_population_bloomington_monroe AS population_bloomington
 ),
 CTE_AUSTIN_POPULATION AS (
     SELECT DISTINCT

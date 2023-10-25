@@ -228,6 +228,7 @@ def clean_bloomington_dataset(dfs):
         values_to_replace = ['Incompatible with owner Lifestyle', 'Moving', 'Unsuitable Accommodation', 'Unable to Afford', 'Allergies', 'Incompatible with other pets', 'Marriage/Relationship split']
         for value in values_to_replace:
             bloomington['intake_type'].replace(value, 'Owner Surrender', inplace=True)
+        bloomington = bloomington.loc[bloomington['intake_date'].dt.year >= 2013]
     except Exception as e:
         log_error_msg(TransformationErrors.CLEAN_BLOOMINGTON_DF_ERROR.value,str(e))
     finally:
@@ -307,7 +308,6 @@ def clean_all_data(dfs):
             df['breed'] = df['breed'].replace({'Short Hair|Shorthair': 'Sh','Medium Hair|Mediumhair':'Mh','Long Hair|Longhair':'Lh'},regex=True)
             df.dropna(subset=['intake_type'], inplace=True)
             df.drop(df[(df['outcome_date'] < df['intake_date']) & (df['outcome_date'] != pd.Timestamp('1700-01-01'))].index, inplace=True)
-            df = df.loc[df['intake_date'].dt.year >= 2013]
         
         with open("openai_animal_types.json", "r") as json_file:
             data = json.load(json_file)

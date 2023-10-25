@@ -24,8 +24,8 @@ class TransformationErrors(Enum):
     CLEAN_NORFOLK_DF_ERROR = "Error doing pandas transformations on Norfolk shelter dataset"
     CLEAN_AUSTIN_DF_ERROR = "Error doing pandas transformations on Austin shelter dataset"
     CLEAN_SONOMA_DF_ERROR = "Error doing pandas transformations on Sonoma shelter dataset"
-    CLEAN_ALL_DATA = "Error in: clean_all_data"
     TRANSFORM_UNEMPLOYMENT_DATA = "Error transforming an 'unemployement' dataframe"
+    CLEAN_ALL_DATA = "Error in clean_all_data"
 
 class DataSources(Enum):
     SHELTER_SONOMA = "https://data.sonomacounty.ca.gov/resource/924a-vesw.json?$select=id,type,breed,color,sex,date_of_birth,intake_date,outcome_date,intake_type,outcome_type"

@@ -220,7 +220,7 @@ A central dashboard where viewers can view:
 
 **Dependencies**:
 
--   Install the necessary Python libraries: `pandas`, `requests`, `numpy`, `BeautifulSoup`, `io`, `concurrent.futures`, `json`, `psycopg2`, `os`, `datetime`, `Enum`, `openai`.
+-   Install the necessary Python libraries: `pandas`, `requests`, `numpy`, `BeautifulSoup`, `io`, `concurrent.futures`, `json`, `psycopg2`, `os`, `datetime`, `enum`, `openai`.
 -   Install database connectors/drivers for PostgreSQL.
   
 

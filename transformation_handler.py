@@ -272,7 +272,7 @@ def transform_unemployment_data(df):
         if 'date' in df:
             df['date'] = pd.to_datetime(df['date'])
             df['year'] = df['date'].dt.year
-        annual_unemployment_df = df.groupby('year')[df.columns[1]].mean().reset_index()
+        annual_unemployment_df = (df.groupby('year')[df.columns[1]].mean()/100).reset_index()
     except Exception as e:
         log_error_msg(TransformationErrors.TRANSFORM_UNEMPLOYMENT_DATA.value, str(e))
     finally:
@@ -287,7 +287,6 @@ def edit_animal_type(df,ai_list,animal_type):
                 lst.append(animal)
     for breed in lst:
         df.loc[df['breed'] == breed, 'type'] = animal_type
-
 
 def clean_all_data(dfs):
     clean_data_dict = {}
@@ -307,7 +306,8 @@ def clean_all_data(dfs):
             df[date_columns] = df[date_columns].fillna('1700-01-01').astype('datetime64[ns]')
             df['breed'] = df['breed'].replace({'Short Hair|Shorthair': 'Sh','Medium Hair|Mediumhair':'Mh','Long Hair|Longhair':'Lh'},regex=True)
             df.dropna(subset=['intake_type'], inplace=True)
-            df.drop(df[df['outcome_date'] < df['intake_date']].index, inplace=True)
+            df.drop(df[(df['outcome_date'] < df['intake_date']) & (df['outcome_date'] != pd.Timestamp('1700-01-01'))].index, inplace=True)
+            df = df.loc[df['intake_date'].dt.year >= 2013]
         
         with open("openai_animal_types.json", "r") as json_file:
             data = json.load(json_file)
@@ -343,4 +343,3 @@ def clean_all_data(dfs):
             log_error_msg(TransformationErrors.CLEAN_ALL_DATA.value, str(e))
     finally:
         return clean_data_dict
-    

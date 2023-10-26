@@ -293,47 +293,22 @@ def edit_animal_type(df,ai_list,animal_type):
         df.loc[df['breed'] == breed, 'type'] = animal_type
 
 def edit_all_types(dfs):
-    with open("openai_animal_types.json", "r") as json_file:
-        data = json.load(json_file)
-    birds_list = data['bird'].split(', ')
-    birds_list = [i.title() for i in birds_list]
-    livestock_list = data['livestock'].split(', ')
-    livestock_list = [i.title() for i in livestock_list]
-    for df in dfs:
-        edit_animal_type(df,birds_list,'Bird')
-        edit_animal_type(df,livestock_list,'Livestock')
-
-def clean_all_data(dfs):
-    clean_data_dict = {}
     try:
-        sonoma = clean_sonoma_dataset(dfs)
-        austin = clean_austin_datasets(dfs)
-        norfolk = clean_norfolk_dataset(dfs)
-        bloomington = clean_bloomington_dataset(dfs)
-        dallas = clean_dallas_dataset(dfs)
+        with open("openai_animal_types.json", "r") as json_file:
+            data = json.load(json_file)
+        birds_list = data['bird'].split(', ')
+        birds_list = [i.title() for i in birds_list]
+        livestock_list = data['livestock'].split(', ')
+        livestock_list = [i.title() for i in livestock_list]
+        for df in dfs:
+            edit_animal_type(df,birds_list,'Bird')
+            edit_animal_type(df,livestock_list,'Livestock')
+    except Exception as e:
+        log_error_msg(TransformationErrors.EDIT_ANIMAL_TYPE.value, str(e))
 
-        intakes_dfs = [sonoma, austin, norfolk, bloomington, dallas]
-
-        object_columns = ['type', 'breed', 'color', 'intake_type', 'sex', 'outcome_type']
-        date_columns = ['date_of_birth','intake_date','outcome_date']
-        for df in intakes_dfs:
-            df[object_columns] = df[object_columns].astype(str)
-            df[date_columns] = df[date_columns].fillna('1700-01-01').astype('datetime64[ns]')
-            df['breed'] = df['breed'].replace({
-                'Short Hair|Shorthair': 'Sh','Medium Hair|Mediumhair':'Mh','Long Hair|Longhair':'Lh',
-                'Amer |Am ': 'American', 'Aust ':'Australian', 'Belg ':'Belgian', 'Alask ':'Alaskan',
-                'Anatol ':'Anatolian', 'Eng ': 'English', 'Retriever':'Retr', 'Min':'Miniature'},regex=True)
-            df.dropna(subset=['intake_type'], inplace=True)
-            df.drop(df[(df['outcome_date'] < df['intake_date']) & (df['outcome_date'] != pd.Timestamp('1700-01-01'))].index, inplace=True)
-
-        edit_all_types(intakes_dfs)
-
-        clean_data_dict.update({f"{IntakesOutcomesTablesNames.SONOMA_INTAKES_OUTCOMES.value}":sonoma,
-                                f"{IntakesOutcomesTablesNames.AUSTIN_INTAKES_OUTCOMES.value}":austin,
-                                f"{IntakesOutcomesTablesNames.NORFOLK_INTAKES_OUTCOMES.value}":norfolk,
-                                f"{IntakesOutcomesTablesNames.BLOOMINGTON_INTAKES_OUTCOMES.value}":bloomington,
-                                f"{IntakesOutcomesTablesNames.DALLAS_INTAKES_OUTCOMES.value}":dallas})
-        
+def clean_demographic_dfs(dfs):
+    try:
+        clean_data_dict = {}
         for key,value in dfs.items():
             if key.startswith("unemployment"): 
                     annual_df = transform_unemployment_data(value)
@@ -348,6 +323,45 @@ def clean_all_data(dfs):
                     clean_data_dict.update({key:value})
             else:
                 pass
+    except Exception as e:
+        log_error_msg(TransformationErrors.CLEAN_DEMOGRAPHIC_DATA.value,str(e))
+    finally:
+        return clean_data_dict
+
+def clean_all_data(dfs):
+    clean_data_dict = {}
+    try:
+        sonoma = clean_sonoma_dataset(dfs)
+        austin = clean_austin_datasets(dfs)
+        norfolk = clean_norfolk_dataset(dfs)
+        bloomington = clean_bloomington_dataset(dfs)
+        dallas = clean_dallas_dataset(dfs)
+
+        intakes_dfs = [sonoma, austin, norfolk, bloomington, dallas]
+        edit_all_types(intakes_dfs)
+
+        object_columns = ['type', 'breed', 'color', 'intake_type', 'sex', 'outcome_type']
+        date_columns = ['date_of_birth','intake_date','outcome_date']
+        for df in intakes_dfs:
+            df[object_columns] = df[object_columns].astype(str)
+            df[date_columns] = df[date_columns].fillna('1700-01-01').astype('datetime64[ns]')
+            df['breed'] = df['breed'].replace({
+                'Short Hair|Shorthair': 'Sh','Medium Hair|Mediumhair':'Mh','Long Hair|Longhair':'Lh',
+                'Amer |Am ': 'American', 'Aust ':'Australian', 'Belg ':'Belgian', 'Alask ':'Alaskan',
+                'Anatol ':'Anatolian', 'Eng ': 'English', 'Retriever':'Retr', 'Min':'Miniature'},regex=True)
+            df.dropna(subset=['intake_type'], inplace=True)
+            df.drop(df[(df['outcome_date'] < df['intake_date']) & (df['outcome_date'] != pd.Timestamp('1700-01-01'))].index, inplace=True)
+            df.loc[df['breed'] == 'Guinea Pig', 'type'] = 'Other'
+        
+        clean_data_dict.update({f"{IntakesOutcomesTablesNames.SONOMA_INTAKES_OUTCOMES.value}":sonoma,
+                                f"{IntakesOutcomesTablesNames.AUSTIN_INTAKES_OUTCOMES.value}":austin,
+                                f"{IntakesOutcomesTablesNames.NORFOLK_INTAKES_OUTCOMES.value}":norfolk,
+                                f"{IntakesOutcomesTablesNames.BLOOMINGTON_INTAKES_OUTCOMES.value}":bloomington,
+                                f"{IntakesOutcomesTablesNames.DALLAS_INTAKES_OUTCOMES.value}":dallas})
+        
+        demographic_dict = clean_demographic_dfs(dfs)
+        clean_data_dict.update(demographic_dict)
+
     except Exception as e:
             log_error_msg(TransformationErrors.CLEAN_ALL_DATA.value, str(e))
     finally:

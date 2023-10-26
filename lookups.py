@@ -26,7 +26,8 @@ class TransformationErrors(Enum):
     CLEAN_SONOMA_DF_ERROR = "Error doing pandas transformations on Sonoma shelter dataset"
     TRANSFORM_UNEMPLOYMENT_DATA = "Error transforming an 'unemployement' dataframe"
     CLEAN_ALL_DATA = "Error in clean_all_data"
-    CLEAN_DEMOGRAPHIC_DATA = "clean_demographic_dfs"
+    CLEAN_DEMOGRAPHIC_DATA = "Error in clean_demographic_dfs"
+    EDIT_ANIMAL_TYPE = "Error in edit_all_types"
 
 class DataSources(Enum):
     SHELTER_SONOMA = "https://data.sonomacounty.ca.gov/resource/924a-vesw.json?$select=id,type,breed,color,sex,date_of_birth,intake_date,outcome_date,intake_type,outcome_type"

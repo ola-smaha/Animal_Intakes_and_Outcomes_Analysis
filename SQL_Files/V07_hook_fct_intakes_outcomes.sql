@@ -13,7 +13,7 @@ CREATE TABLE IF NOT EXISTS target_schema.fct_intakes_outcomes
 	income_id INT REFERENCES target_schema.dim_per_capita_income (income_id),
 	unemployment_id INT REFERENCES target_schema.dim_unemployment (unemployment_id),
 	CONSTRAINT unique_animal_intake_outcome
-	UNIQUE (animal_id, intake_date, intake_type, outcome_date, outcome_type)
+	UNIQUE (animal_id, intake_date)
 );
 CREATE INDEX IF NOT EXISTS idx_intakes_outcomes ON target_schema.fct_intakes_outcomes (intake_outcome_id);
 WITH CTE_COMBINED_DATA AS
@@ -58,7 +58,7 @@ INNER JOIN target_schema.dim_color color
 	ON CTE_COMBINED_DATA.color = color.animal_color
 LEFT OUTER JOIN target_schema.dim_animal_breed breed
 	ON CTE_COMBINED_DATA.breed = breed.animal_breed
-ON CONFLICT (animal_id, intake_date, intake_type, outcome_date, outcome_type) DO UPDATE
+ON CONFLICT (animal_id, intake_date) DO UPDATE
 SET
 	outcome_date = EXCLUDED.outcome_date,
     outcome_type = EXCLUDED.outcome_type;
@@ -67,7 +67,7 @@ CREATE TEMPORARY TABLE temp_region_year AS
     SELECT
         fct.intake_outcome_id AS fct_id,
         fct.region AS fct_region,
-        EXTRACT(YEAR FROM fct.outcome_date) AS fct_year
+        EXTRACT(YEAR FROM fct.intake_date) AS fct_year
     FROM target_schema.fct_intakes_outcomes fct
     WHERE fct.population_id IS NULL
 	OR fct.income_id IS NULL

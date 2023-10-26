@@ -3,6 +3,7 @@
 
 <div>
 
+> Hello world! This is the project’s summary that describes the project, plain and simple, limited to the space available.
 > A comprehensive analysis of the factors influencing animals intakes and outcomes in shelters and centers distributed among five regions across the United States.<br>These factors include animal age, sex, type, breed as well as socio-economic indicators like population, per capita income and unemployment rate.<br>
 **[PROJECT PHILOSOPHY](#project-philosophy) • [PROTOTYPING](#prototyping) • [TECH STACKS](#stacks) • [IMPLEMENTATION](#demo) • [HOW TO RUN?](#run)**
 

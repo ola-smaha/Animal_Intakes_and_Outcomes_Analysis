@@ -18,19 +18,19 @@ CREATE TABLE IF NOT EXISTS target_schema.fct_intakes_outcomes
 CREATE INDEX IF NOT EXISTS idx_intakes_outcomes ON target_schema.fct_intakes_outcomes (intake_outcome_id);
 WITH CTE_COMBINED_DATA AS
 (
-	SELECT animal_id, breed, color, intake_date, intake_type, outcome_date, outcome_type, region
+	SELECT DISTINCT animal_id, breed, color, intake_date, intake_type, outcome_date, outcome_type, region
 	FROM target_schema.stg_intakes_outcomes_austin
 	UNION ALL
-	SELECT id, breed, color, intake_date, intake_type, outcome_date, outcome_type, region
+	SELECT DISTINCT id, breed, color, intake_date, intake_type, outcome_date, outcome_type, region
 	FROM target_schema.stg_intakes_outcomes_bloomington
 	UNION ALL
-	SELECT animal_id, breed, color, intake_date, intake_type, outcome_date, outcome_type, region
+	SELECT DISTINCT animal_id, breed, color, intake_date, intake_type, outcome_date, outcome_type, region
 	FROM target_schema.stg_intakes_outcomes_dallas
 	UNION ALL
-	SELECT animal_id, breed, color, intake_date, intake_type, outcome_date, outcome_type, region
+	SELECT DISTINCT animal_id, breed, color, intake_date, intake_type, outcome_date, outcome_type, region
 	FROM target_schema.stg_intakes_outcomes_norfolk
 	UNION ALL
-	SELECT animal_id, breed, color, intake_date, intake_type, outcome_date, outcome_type, region
+	SELECT DISTINCT animal_id, breed, color, intake_date, intake_type, outcome_date, outcome_type, region
 	FROM target_schema.stg_intakes_outcomes_sonoma
 )
 INSERT INTO target_schema.fct_intakes_outcomes

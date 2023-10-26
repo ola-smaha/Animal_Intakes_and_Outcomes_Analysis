@@ -102,6 +102,7 @@ def clean_sonoma_dataset(dfs):
         df = dfs['shelter_sonoma']   
         sonoma = df.copy()
         sonoma = sonoma.drop_duplicates()
+        sonoma.drop_duplicates(subset=['id','intake_date'],keep='first',inplace = True)
         date_columns = ['intake_date','date_of_birth','outcome_date']
         sonoma[date_columns] = sonoma[date_columns].apply(pd.to_datetime)
         sonoma.dropna(subset=['intake_date','intake_type'], inplace=True)
@@ -128,8 +129,8 @@ def clean_austin_datasets(dfs):
         austin_out = df2.copy()
         austin_in.rename(columns={'animal_type':'type','datetime':'intake_date'},inplace=True)
         austin_out.rename(columns={'animal_type':'type','datetime':'outcome_date','sex_upon_outcome':'sex'},inplace=True)
-        austin_in.sort_values(by='intake_date', inplace=True)
-        austin_out.sort_values(by= 'outcome_date', inplace=True)
+        austin_in.sort_values(by=['animal_id','intake_date'], inplace=True)
+        austin_out.sort_values(by= ['animal_id','outcome_date'], inplace=True)
         austin_in['intake_date'] = pd.to_datetime(austin_in['intake_date'])
         date_columns = ['date_of_birth','outcome_date']
         for col in date_columns:
@@ -170,6 +171,7 @@ def clean_norfolk_dataset(dfs):
         norfolk['date_of_birth'] =  pd.to_datetime(norfolk['date_of_birth'])
         norfolk.rename(columns={'animal_type':'type','primary_breed': 'breed', 'primary_color':'color'},inplace=True)
         norfolk.drop_duplicates(inplace=True)
+        norfolk.drop_duplicates(subset=['animal_id','intake_date'],keep='first',inplace = True)
         norfolk['type'] = np.where(~norfolk['type'].isin(['Cat', 'Dog']), 'Other', norfolk['type'])
         data_columns = ['breed', 'color']
         norfolk[data_columns] = norfolk[data_columns].apply(lambda x: x.str.title())
@@ -243,6 +245,7 @@ def clean_dallas_dataset(dfs):
                 dallas_merged = pd.concat([dallas_merged, df])
         dallas = dallas_merged.copy()
         dallas.drop_duplicates(inplace=True)
+        dallas.drop_duplicates(subset=['animal_id','intake_date'],keep='first',inplace = True)
         dallas.rename(columns={'animal_type':'type','animal_breed':'breed'},inplace=True)
         dallas['intake_date'] = pd.to_datetime(dallas['intake_date'])
         dallas['intake_time'] = pd.to_timedelta(dallas['intake_time'])
@@ -289,6 +292,17 @@ def edit_animal_type(df,ai_list,animal_type):
     for breed in lst:
         df.loc[df['breed'] == breed, 'type'] = animal_type
 
+def edit_all_types(dfs):
+    with open("openai_animal_types.json", "r") as json_file:
+        data = json.load(json_file)
+    birds_list = data['bird'].split(', ')
+    birds_list = [i.title() for i in birds_list]
+    livestock_list = data['livestock'].split(', ')
+    livestock_list = [i.title() for i in livestock_list]
+    for df in dfs:
+        edit_animal_type(df,birds_list,'Bird')
+        edit_animal_type(df,livestock_list,'Livestock')
+
 def clean_all_data(dfs):
     clean_data_dict = {}
     try:
@@ -305,19 +319,14 @@ def clean_all_data(dfs):
         for df in intakes_dfs:
             df[object_columns] = df[object_columns].astype(str)
             df[date_columns] = df[date_columns].fillna('1700-01-01').astype('datetime64[ns]')
-            df['breed'] = df['breed'].replace({'Short Hair|Shorthair': 'Sh','Medium Hair|Mediumhair':'Mh','Long Hair|Longhair':'Lh'},regex=True)
+            df['breed'] = df['breed'].replace({
+                'Short Hair|Shorthair': 'Sh','Medium Hair|Mediumhair':'Mh','Long Hair|Longhair':'Lh',
+                'Amer |Am ': 'American', 'Aust ':'Australian', 'Belg ':'Belgian', 'Alask ':'Alaskan',
+                'Anatol ':'Anatolian', 'Eng ': 'English', 'Retriever':'Retr', 'Min':'Miniature'},regex=True)
             df.dropna(subset=['intake_type'], inplace=True)
             df.drop(df[(df['outcome_date'] < df['intake_date']) & (df['outcome_date'] != pd.Timestamp('1700-01-01'))].index, inplace=True)
-        
-        with open("openai_animal_types.json", "r") as json_file:
-            data = json.load(json_file)
-        birds_list = data['bird'].split(', ')
-        birds_list = [i.title() for i in birds_list]
-        livestock_list = data['livestock'].split(', ')
-        livestock_list = [i.title() for i in livestock_list]
-        for df in intakes_dfs:
-            edit_animal_type(df,birds_list,'Bird')
-            edit_animal_type(df,livestock_list,'Livestock')
+
+        edit_all_types(intakes_dfs)
 
         clean_data_dict.update({f"{IntakesOutcomesTablesNames.SONOMA_INTAKES_OUTCOMES.value}":sonoma,
                                 f"{IntakesOutcomesTablesNames.AUSTIN_INTAKES_OUTCOMES.value}":austin,

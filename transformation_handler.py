@@ -281,16 +281,18 @@ def transform_unemployment_data(df):
         log_error_msg(TransformationErrors.TRANSFORM_UNEMPLOYMENT_DATA.value, str(e))
     finally:
         return annual_unemployment_df
-    
 
 def edit_animal_type(df,ai_list,animal_type):
     lst = []
-    for animal in df.loc[df['type'] == 'Other']['breed'].tolist():
-        for animal_ai in ai_list:
-            if animal_ai in animal and animal not in lst:
-                lst.append(animal)
-    for breed in lst:
-        df.loc[df['breed'] == breed, 'type'] = animal_type
+    try:
+        for animal in df.loc[df['type'] == 'Other']['breed'].tolist():
+            for animal_ai in ai_list:
+                if animal_ai in animal and animal not in lst:
+                    lst.append(animal)
+        for breed in lst:
+            df.loc[df['breed'] == breed, 'type'] = animal_type
+    except Exception as e:
+        log_error_msg(TransformationErrors.EDIT_ANIMAL_TYPE.value, str(e))
 
 def edit_all_types(dfs):
     try:

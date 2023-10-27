@@ -340,7 +340,6 @@ def clean_all_data(dfs):
         dallas = clean_dallas_dataset(dfs)
 
         intakes_dfs = [sonoma, austin, norfolk, bloomington, dallas]
-        edit_all_types(intakes_dfs)
 
         object_columns = ['type', 'breed', 'color', 'intake_type', 'sex', 'outcome_type']
         date_columns = ['date_of_birth','intake_date','outcome_date']
@@ -353,8 +352,10 @@ def clean_all_data(dfs):
                 'Anatol ':'Anatolian', 'Eng ': 'English', 'Retriever':'Retr', 'Min':'Miniature'},regex=True)
             df.dropna(subset=['intake_type'], inplace=True)
             df.drop(df[(df['outcome_date'] < df['intake_date']) & (df['outcome_date'] != pd.Timestamp('1700-01-01'))].index, inplace=True)
+        edit_all_types(intakes_dfs)
+        for df in intakes_dfs:
             df.loc[df['breed'] == 'Guinea Pig', 'type'] = 'Other'
-        
+            
         clean_data_dict.update({f"{IntakesOutcomesTablesNames.SONOMA_INTAKES_OUTCOMES.value}":sonoma,
                                 f"{IntakesOutcomesTablesNames.AUSTIN_INTAKES_OUTCOMES.value}":austin,
                                 f"{IntakesOutcomesTablesNames.NORFOLK_INTAKES_OUTCOMES.value}":norfolk,

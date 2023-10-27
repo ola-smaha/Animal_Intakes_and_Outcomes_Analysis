@@ -2,3 +2,6 @@ psycopg2-binary==2.9.6
 pandas==1.5.3
 requests==2.31.0
 numpy==1.25.2
+openai==0.28.1
+bs4==4.12.2
+concurrent.futures

@@ -16,9 +16,6 @@ class Errors(Enum):
     EXECUTE_POSTHOOK_ERROR = "Error executing execute_posthook function"
 
 class TransformationErrors(Enum):
-    FETCHING_DATA_FROM_SOURCE = "Error fetching data from source"
-    ERROR_STATUS_CODE = "Error: Received status code"
-    READ_DATA_FN_ERROR = "Error processing results"
     CLEAN_DALLAS_DF_ERROR = "Error doing pandas transformations on Dallas shelter datasets"
     CLEAN_BLOOMINGTON_DF_ERROR = "Error doing pandas transformations on Bloomington shelter dataset"
     CLEAN_NORFOLK_DF_ERROR = "Error doing pandas transformations on Norfolk shelter dataset"
@@ -29,6 +26,11 @@ class TransformationErrors(Enum):
     CLEAN_DEMOGRAPHIC_DATA = "Error in clean_demographic_dfs"
     EDIT_ANIMAL_TYPES = "Error in edit_all_types"
     EDIT_ANIMAL_TYPE = "Error in edit_animal_type"
+
+class ExtractionErrors:
+    FETCHING_DATA_FROM_SOURCE = "Error fetching data from source"
+    ERROR_STATUS_CODE = "Error: Received status code"
+    READ_DATA_FN_ERROR = "Error processing results" 
 
 class DataSources(Enum):
     SHELTER_SONOMA = "https://data.sonomacounty.ca.gov/resource/924a-vesw.json?$select=id,type,breed,color,sex,date_of_birth,intake_date,outcome_date,intake_type,outcome_type"
@@ -125,3 +127,11 @@ class DateCondition(Enum):
     AUSTIN = "datetime>0"
     BLOOMINGTON_INTAKES = "intakedate>0 or movementdate>0"
     OTHER = "intake_date>0 or outcome_date>0"
+
+class Open_AI(Enum):
+    OPENAI_API_KEY = "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"
+    BIRD_TYPE = "bird"
+    LIVESTOCK_TYPE = "livestock"
+    GPT_BIRD_CONTENT = "Give me a list of all bird types (example pigeon, lovebird...), comma separated, not numbered"
+    GPT_LIVESTOCK_CONTENT = "Give me a list of all livestock animal types (horse,chicken,sheep,...), comma separated, not numbered"
+    ANIMAL_TYPES_JSON_FILE = "openai_animal_types.json"

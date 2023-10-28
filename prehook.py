@@ -2,9 +2,10 @@ from database_handler import execute_query, create_statement_from_df, create_con
 from logging_handler import log_error_msg  
 from lookups import Errors, PreHookSteps, SQLCommandsPath, DataWareHouseSchema
 import os
-from transformation_handler import clean_all_data, readData
+from data_extraction_handler import readData
+from transformation_handler import clean_all_data
 from misc_handler import get_sql_files_list
-import datetime
+
 
 def execute_sql_folder_prehook(db_session, target_schema = DataWareHouseSchema.SCHEMA_NAME, sql_commands_path = SQLCommandsPath.SQL_FOLDER):
     sql_files = None

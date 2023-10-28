@@ -3,7 +3,8 @@ from logging_handler import log_error_msg
 from lookups import Errors, HookSteps, DataWareHouseSchema, SQLCommandsPath, ETL_Checkpoint
 from misc_handler import get_sql_files_list
 import os
-from transformation_handler import readData, clean_all_data
+from data_extraction_handler import readData
+from transformation_handler import clean_all_data
 import datetime
 
 def execute_sql_folder_hook(db_session, target_schema = DataWareHouseSchema.SCHEMA_NAME, sql_commands_path = SQLCommandsPath.SQL_FOLDER):

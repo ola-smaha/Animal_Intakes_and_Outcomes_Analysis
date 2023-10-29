@@ -80,7 +80,7 @@ def execute_prehook(logger, sql_commands_path=SQLCommandsPath.SQL_FOLDER):
         execute_sql_folder_prehook(db_session, DataWareHouseSchema.SCHEMA_NAME, sql_commands_path)
 
         step = 3
-        logger.info("Step 3: Creating SQL staging table")
+        logger.info("Step 3: Creating SQL staging tables")
         create_sql_staging_table(db_session, DataWareHouseSchema.SCHEMA_NAME)
 
         step = 4

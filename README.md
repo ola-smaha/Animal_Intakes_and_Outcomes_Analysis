@@ -67,7 +67,13 @@
 > We have designed our projects to webscrape, through an ETL project and including it in a PowerBI Sample Dashboard, 
 
 
+### Logger File
+
   
+
+| app.log |
+
+<img  src = "./readme/log_preview.png"> 
   
 
 ### Data Flow Diagrams
@@ -77,7 +83,7 @@
 | Schema Diagram |
 
 
-| ![Map](readme/diagram_schema.png)| 
+<img  src = "readme/diagram_schema.png"> 
 
   
 <br><br>
@@ -129,61 +135,50 @@ A central dashboard where viewers can view:
 <a  name="Demo"  ></a>
 <img  src="./readme/title5.svg" id="#demo"/>
 
-> Show command line of ETL performance - Logger view
 
   
-### App
+### Report
 
 
-| Dashboard Screen | Create Bin Screen |
+> Home Page 
 
-| ---| ---|
-
-| ![Landing](./readme/implementation/dashboard.gif) | ![fsdaf](./readme/implementation/create_bin.gif) |
+<img  src = "./readme/powerbi_report/home_page.png"> 
 
   
 
-| Bins to Map Screen |
+> Overview 
 
-| ---|
-
-| ![fsdaf](./readme/implementation/map.gif) |
+<img  src = "./readme/powerbi_report/overview.png"> 
 
   
   
 
-| Filter Bins Screen | Update Pickup Time Screen |
+> Adoption Analysis 
 
-| ---| ---|
 
-| ![Landing](./readme/implementation/filter_bins.gif) | ![fsdaf](./readme/implementation/update_pickup.gif) |
+<img  src = "./readme/powerbi_report/adoption_analysis.png"> 
+  
+  
+
+> Socio-economic Analysis 
+
+
+<img  src = "./readme/powerbi_report/socio_economic_analysis.png"> 
+
+  
+  
+> Summary Analysis 
+
+
+<img  src = "./readme/powerbi_report/summary_analysis.png"> 
 
   
   
 
-| Announcements Screen |
+> Available for Adoption 
 
-| ---|
 
-| ![fsdaf](./readme/implementation/message.gif)|
-
-  
-  
-
-| Change Map Screen | Edit Profile Screen |
-
-| ---| ---|
-
-| ![Landing](./readme/implementation/change_map.gif) | ![fsdaf](./readme/implementation/edit_profile.gif) |
-
-  
-  
-
-| Landing Screen |
-
-| ---|
-
-| ![fsdaf](./readme/implementation/landing.gif)|
+<img  src = "./readme/powerbi_report/available_for_adoption.png"> 
 
   
 
@@ -239,3 +234,6 @@ git clone https://github.com/ola-smaha/FSD_Final_Project_2023.git
 **Start the Data Ingestion & ETL Process**:
 `python etl_script.py`
 
+You should be able to check the app.log file to see the ETL work.
+
+As for the dashboard access: Please use this link "public powerbi link" to access your data.

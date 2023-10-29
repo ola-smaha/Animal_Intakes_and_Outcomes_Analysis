@@ -74,21 +74,12 @@
 
   
 
-| Map screen | Dashboard screen | Bin Management screen |
+| Schema Diagram |
 
-| ---| ---| ---|
 
-| ![Map](readme/mockups/web/map.png)| ![Map](./readme/mockups/web/dashboard.png)| ![Map](./readme/mockups/web/bin_crud.png)|
+| ![Map](readme/diagram_schema.png)| 
 
   
-  
-
-| Announcements screen | Login screen | Landing screen |
-
-| ---| ---| ---|
-
-| ![Map](readme/mockups/web/announcements.png)| ![Map](./readme/mockups/web/login.png)| ![Map](./readme/mockups/web/landing.png)|
-
 <br><br>
 
   

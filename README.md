@@ -146,28 +146,28 @@ A central dashboard where viewers can view:
 
   
 
-> Overview 
+| Overview |
 
 <img  src = "./readme/powerbi_report/overview.png"> 
 
   
   
 
-> Adoption Analysis 
+| Adoption Analysis |
 
 
 <img  src = "./readme/powerbi_report/adoption_analysis.png"> 
   
   
 
-> Socio-economic Analysis 
+| Socio-economic Analysis |
 
 
 <img  src = "./readme/powerbi_report/socio_economic_analysis.png"> 
 
   
   
-> Summary Analysis 
+| Summary Analysis |
 
 
 <img  src = "./readme/powerbi_report/summary_analysis.png"> 
@@ -175,7 +175,7 @@ A central dashboard where viewers can view:
   
   
 
-> Available for Adoption 
+| Available for Adoption |
 
 
 <img  src = "./readme/powerbi_report/available_for_adoption.png"> 

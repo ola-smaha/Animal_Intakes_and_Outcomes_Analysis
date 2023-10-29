@@ -1,5 +1,5 @@
 from database_handler import execute_query, create_statement_from_df, create_connection, close_connection
-from logging_handler import log_error_msg  
+from logging_handler import log_error_msg, setup_logging
 from lookups import Errors, PreHookSteps, SQLCommandsPath, DataWareHouseSchema
 import os
 from data_extraction_handler import readData
@@ -52,17 +52,40 @@ def create_sql_staging_table(db_session, target_schema):
     finally:
         return create_stmt
 
-def execute_prehook(sql_commands_path = SQLCommandsPath.SQL_FOLDER):
+# def execute_prehook(sql_commands_path = SQLCommandsPath.SQL_FOLDER):
+#     step = None
+#     try:
+#         step = 1
+#         db_session = create_connection()
+#         step = 2
+#         execute_sql_folder_prehook(db_session,DataWareHouseSchema.SCHEMA_NAME,sql_commands_path)
+#         step = 3
+#         create_sql_staging_table(db_session,DataWareHouseSchema.SCHEMA_NAME)
+#         step = 4
+#         close_connection(db_session)
+#     except Exception as e:
+#         error_prefix = f'{Errors.PREHOOK_SQL_ERROR.value} on step {step}'
+#         log_error_msg(error_prefix,str(e))
+
+def execute_prehook(logger, sql_commands_path=SQLCommandsPath.SQL_FOLDER):
     step = None
+    logger.info("Executing Prehook:")
     try:
         step = 1
+        logger.info("Step 1: Creating a database connection")
         db_session = create_connection()
+
         step = 2
-        execute_sql_folder_prehook(db_session,DataWareHouseSchema.SCHEMA_NAME,sql_commands_path)
+        logger.info("Step 2: Executing SQL folder prehook")
+        execute_sql_folder_prehook(db_session, DataWareHouseSchema.SCHEMA_NAME, sql_commands_path)
+
         step = 3
-        create_sql_staging_table(db_session,DataWareHouseSchema.SCHEMA_NAME)
+        logger.info("Step 3: Creating SQL staging table")
+        create_sql_staging_table(db_session, DataWareHouseSchema.SCHEMA_NAME)
+
         step = 4
+        logger.info("Step 4: Closing the database connection\n")
         close_connection(db_session)
     except Exception as e:
         error_prefix = f'{Errors.PREHOOK_SQL_ERROR.value} on step {step}'
-        log_error_msg(error_prefix,str(e))
+        logger.error(f'{error_prefix} - {str(e)}')

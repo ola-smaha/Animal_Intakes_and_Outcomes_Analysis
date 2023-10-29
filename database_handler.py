@@ -14,7 +14,6 @@ config_dict = {
 
 def create_connection():
     db_session = None
-    print(f'Connecting to database "{config_dict.get("db_name")}"...')
     try:
         db_session = psycopg2.connect(
             database = config_dict.get('db_name'), 
@@ -23,7 +22,6 @@ def create_connection():
             host = config_dict.get('host'), 
             port = config_dict.get('port')
         )
-        print('Connection was successful.')
     except Exception as e:
         log_error_msg(Errors.ERROR_CONNECTING_TO_DB.value, str(e))
     finally:
@@ -130,10 +128,8 @@ def refresh_connection(db_session):
 
 def close_connection(db_session):
     return_val = None
-    print("Closing connection to database...")
     try:
         return_val = db_session.close()
-        print("Connection is closed.")
     except Exception as e:
         log_error_msg(Errors.ERROR_CLOSING_CONN.value,str(e))
     finally:

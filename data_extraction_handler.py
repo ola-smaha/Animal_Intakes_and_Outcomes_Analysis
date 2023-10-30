@@ -1,5 +1,6 @@
 import requests
 import pandas as pd
+import numpy as np
 from io import StringIO
 from concurrent.futures import ThreadPoolExecutor
 from lookups import DataSources, ExtractionErrors, DateCondition
@@ -71,7 +72,7 @@ def web_scrape_data(soup):
     return df
 
 
-def readData(etl_date = None, limit = None): 
+def readData(etl_date = None, limit = 1): 
     data_dict = dict()
     try:
         sources = list(DataSources)

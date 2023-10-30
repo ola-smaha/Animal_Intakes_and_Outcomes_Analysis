@@ -94,27 +94,6 @@ def insert_data_into_stg_tables(db_session, etl_date, target_schema = DataWareHo
         log_error_msg(HookSteps.INSERT_INTO_STG_TABLE.value, str(e))
 
 
-# def execute_hook():
-#     step = None
-#     try:
-#         step = 1
-#         db_session = create_connection()
-#         step = 2
-#         create_etl_checkpoint(DataWareHouseSchema.SCHEMA_NAME, db_session)
-#         step = 3
-#         etl_date, etl_time_exists = return_etl_last_updated_date(db_session)
-#         step = 4
-#         insert_data_into_stg_tables(db_session=db_session,target_schema=DataWareHouseSchema.SCHEMA_NAME, etl_date=etl_date)
-#         step = 5
-#         execute_sql_folder_hook(db_session)
-#         step = 6
-#         insert_or_update_etl_checkpoint(db_session, etl_time_exists=etl_time_exists)
-#         step = 7
-#         close_connection(db_session)
-#     except Exception as e:
-#         error_prefix = f'{Errors.HOOK_SQL_ERROR.value} on step {step}'
-#         log_error_msg(error_prefix,str(e))
-
 def execute_hook(logger):
     step = None
     logger.info("Executing hook:")

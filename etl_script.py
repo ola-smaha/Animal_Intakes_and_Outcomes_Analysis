@@ -6,13 +6,15 @@ import schedule
 import time
 
 def etl_job():
+    print("ETL job is running...\n")
     logger = setup_logging()
     execute_prehook(logger)
     execute_hook(logger)
     execute_posthook(logger)
 
-# schedule.every(1).day.do(etl_job)
+# Scheduling the job to be run every day
+schedule.every(1).day.do(etl_job)
 
-# while True:
-#     schedule.run_pending()
-#     time.sleep(12*3600)
+while True:
+    schedule.run_pending()
+    time.sleep(6*3600)

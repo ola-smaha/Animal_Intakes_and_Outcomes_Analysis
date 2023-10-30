@@ -16,16 +16,6 @@ def truncate_staging_table(db_session, source_name=DataWareHouseSchema.SCHEMA_NA
     except Exception as e:
         log_error_msg(Errors.POSTHOOK_TRUNCATE_ERROR.value, str(e))
 
-# def execute_posthook():
-#     try:
-#         step = 1
-#         db_session = create_connection()
-#         step = 2
-#         truncate_staging_table(db_session, source_name = DataWareHouseSchema.SCHEMA_NAME)
-#         step = 3
-#         close_connection(db_session)
-#     except Exception as e:
-#         log_error_msg(f"{Errors.EXECUTE_POSTHOOK_ERROR.value}: error on step {step}", str(e))
 
 def execute_posthook(logger):
     step = None

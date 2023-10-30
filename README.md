@@ -193,7 +193,8 @@ A central dashboard where viewers can view:
 
 <br>
 
-
+| Report Recap Video|
+| ---------------|
 
 https://github.com/ola-smaha/Animal_Intakes_and_Outcomes_Analysis/assets/141483688/6ba970f0-0443-4e0b-a4ee-a5b3d5d6134a
 

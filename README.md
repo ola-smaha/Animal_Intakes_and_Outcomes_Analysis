@@ -195,9 +195,8 @@ A central dashboard where viewers can view:
 
 | Report Video Recap |
 | -------------------|
-|[![video](https://github.com/ola-smaha/Animal_Intakes_and_Outcomes_Analysis/blob/main/readme/powerbi_report/videos/powerbi.mp4)] |
+https://github.com/ola-smaha/Animal_Intakes_and_Outcomes_Analysis/assets/141483688/6f825d05-5fa3-4e97-9af8-aeacca26fdb5
 
-https://github.com/ola-smaha/Animal_Intakes_and_Outcomes_Analysis/blob/main/readme/powerbi_report/videos/powerbi.mp4
 
 
 
@@ -239,7 +238,7 @@ https://github.com/ola-smaha/Animal_Intakes_and_Outcomes_Analysis/blob/main/read
 
 ```sh
 
-git clone https://github.com/ola-smaha/FSD_Final_Project_2023.git
+git clone https://github.com/ola-smaha/Animal_Intakes_and_Outcomes_Analysis.git
 
 ```
 

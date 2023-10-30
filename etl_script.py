@@ -15,4 +15,4 @@ schedule.every().day.do(etl_job)
 
 while True:
     schedule.run_pending()
-    time.sleep(24*3600)
+    time.sleep(12*3600)

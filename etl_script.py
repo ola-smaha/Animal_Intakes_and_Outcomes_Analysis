@@ -2,8 +2,17 @@ from logging_handler import setup_logging
 from prehook import execute_prehook
 from hook import execute_hook
 from posthook import execute_posthook
+import schedule
+import time
 
-logger = setup_logging()
-execute_prehook(logger)
-execute_hook(logger)
-execute_posthook(logger)
+def etl_job():
+    logger = setup_logging()
+    execute_prehook(logger)
+    execute_hook(logger)
+    execute_posthook(logger)
+
+# schedule.every().day.do(etl_job)
+
+# while True:
+#     schedule.run_pending()
+#     time.sleep(24*3600)

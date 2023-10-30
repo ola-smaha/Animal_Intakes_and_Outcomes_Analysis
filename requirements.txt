@@ -4,4 +4,4 @@ requests==2.31.0
 numpy==1.25.2
 openai==0.28.1
 bs4==4.12.2
-concurrent.futures
+schedule==1.2.1

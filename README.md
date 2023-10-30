@@ -70,38 +70,97 @@
 ### Logger File
 
   
-
 | app.log |
+| -----------------|
+|![Log](./readme/log_preview.png) |
 
-<img  src = "./readme/log_preview.png"> 
-  
 
 ### Data Flow Diagrams
 
   
-
 | Schema Diagram |
-
-
-<img  src = "readme/diagram_schema.png"> 
+| ---------------|
+|![Log](./readme/diagram_schema.png) |
+ 
 
   
 <br><br>
 
+### Report Screenshots
+
+| Home Page |
+| ----------|
+|![Home](./readme/powerbi_report/home_page.png) |
+ 
+
+<br>
+
+| Overview |
+| ----------|
+|![Overview](./readme/powerbi_report/overview.png) | 
+
+
+ <br> 
+  
+| Adoption Analysis |
+| ----------|
+|![Adoption Analysis](./readme/powerbi_report/adoption_analysis.png) | 
+
+
+  
+<br>
+
+| Socio-economic Analysis |
+| ------------------------|
+|![Socio-economic](./readme/powerbi_report/socio_economic_analysis.png) | 
+
+
+<br> 
   
 
+| Summary Analysis |
+| -----------------|
+|![Summary](./readme/powerbi_report/summary_analysis.png) | 
+
+
+<br> 
+  
+| Available for Adoption |
+| -----------------------|
+|![for adoption](./readme/powerbi_report/available_for_adoption.png) | 
+
+
+<br>
+
+
+| Toolbox for Overview Page | Toolbox for Adoption Analysis Page | Toolbox for Socio-economic Analysis Page |
+| ---------| ---------| ---------|
+|![Overview](./readme/powerbi_report/overview_toolbox.png) |![adoption](./readme/powerbi_report/intake_toolbox.png)|![socio](./readme/powerbi_report/outcome_toolbox.png)|
 <!-- Tech stacks -->
 
 <a  name="stacks"></a>
 <img  src="./readme/title5.svg" id="stacks" />
 
 <br>
+Animal Intakes and Outcomes Analysis is created using the following technologies:
+
+1. **SQL:** Used to create schema tables.
+2. **Python:** Used to code data extraction and cleaning processes and ETL steps (Prehook, Hook, Posthook) using Python modules and libraries like pandas, requests, numpy, BeautifulSoup, psycopg2, openai, concurrent.futures, enum, etc.
+3. **SoQL (Socrata Query Language):** Used to query SODA API endpoint links and retrieve data directly from the source based on a date condition.
+4. **PowerBI:** Used to create an interactive report through visuals and DAX.
+
+
+  
+<br>
+
+<br>
 
   
 
-Project is built using the following technologies:
+<!-- Implementation -->
 
-  
+<a  name="Demo"  ></a>
+<img  src="./readme/title4.svg" id="#demo"/>
 
 ## Frontend
 
@@ -124,63 +183,7 @@ A central dashboard where viewers can view:
 2. ETL Pipeline: using python and pandas, raw data is extracted, transformed into a usable format and loaded into postgreSQL database.
 3. Database: Schema Design - Indexing - Data Integrity - Backup & Recovery. 
 
-<br>
 
-<br>
-
-  
-
-<!-- Implementation -->
-
-<a  name="Demo"  ></a>
-<img  src="./readme/title4.svg" id="#demo"/>
-
-
-  
-### Report
-
-
-> Home Page 
-
-<img  src = "./readme/powerbi_report/home_page.png"> 
-
-<br>
-
-> Overview 
-
-<img  src = "./readme/powerbi_report/overview.png"> 
-
- <br> 
-  
-
-> Adoption Analysis
-
-
-<img  src = "./readme/powerbi_report/adoption_analysis.png"> 
-  
-<br>
-
-> Socio-economic Analysis 
-
-
-<img  src = "./readme/powerbi_report/socio_economic_analysis.png"> 
-
-<br> 
-  
-> Summary Analysis 
-
-
-<img  src = "./readme/powerbi_report/summary_analysis.png"> 
-
- <br> 
-  
-
-> Available for Adoption 
-
-
-<img  src = "./readme/powerbi_report/available_for_adoption.png"> 
-
-  
 
 <br><br>
 

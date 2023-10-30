@@ -195,7 +195,7 @@ A central dashboard where viewers can view:
 
 | Report Video Recap |
 | -------------------|
-|[![video](https://github.com/ola-smaha/Animal_Intakes_and_Outcomes_Analysis/assets/141483688/74b3c4cd-a27a-4345-bbca-5833a44c414d)] |
+|[![video](https://github.com/ola-smaha/Animal_Intakes_and_Outcomes_Analysis/blob/main/readme/powerbi_report/videos/powerbi.mp4)] |
 
 
 <br><br>

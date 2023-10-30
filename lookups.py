@@ -14,6 +14,9 @@ class Errors(Enum):
     HOOK_SQL_ERROR = "Hook error"
     POSTHOOK_TRUNCATE_ERROR = "Error truncating staging table"
     EXECUTE_POSTHOOK_ERROR = "Error executing execute_posthook function"
+    ADD_RESPONSE_TO_ANIMAL_TYPES_JSON = "Error in add_response_to_animal_types_json"
+    GET_GPT_ANIMAL_TYPE_STRING = "Error in get_gpt_animal_type_string"
+    GET_SQL_FILES_LIST = "Error in get_sql_files_list"
 
 class ExtractionErrors:
     FETCHING_DATA_FROM_SOURCE = "Error fetching data from source"

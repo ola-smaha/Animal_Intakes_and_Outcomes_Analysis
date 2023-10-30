@@ -11,8 +11,8 @@ def etl_job():
     execute_hook(logger)
     execute_posthook(logger)
 
-schedule.every().day.do(etl_job)
+# schedule.every(1).day.do(etl_job)
 
-while True:
-    schedule.run_pending()
-    time.sleep(12*3600)
+# while True:
+#     schedule.run_pending()
+#     time.sleep(12*3600)

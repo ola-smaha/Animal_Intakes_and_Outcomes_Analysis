@@ -15,6 +15,13 @@ class Errors(Enum):
     POSTHOOK_TRUNCATE_ERROR = "Error truncating staging table"
     EXECUTE_POSTHOOK_ERROR = "Error executing execute_posthook function"
 
+class ExtractionErrors:
+    FETCHING_DATA_FROM_SOURCE = "Error fetching data from source"
+    ERROR_STATUS_CODE = "Error: Received status code"
+    READ_DATA_FN_ERROR = "Error processing results"
+    GET_DATA_COLUMNS = "Error in get_data_columns"
+    WEBSCRAPE_DATA_ERROR = "Error in web_scrape_data"
+
 class TransformationErrors(Enum):
     CLEAN_DALLAS_DF_ERROR = "Error doing pandas transformations on Dallas shelter datasets"
     CLEAN_BLOOMINGTON_DF_ERROR = "Error doing pandas transformations on Bloomington shelter dataset"
@@ -26,11 +33,6 @@ class TransformationErrors(Enum):
     CLEAN_DEMOGRAPHIC_DATA = "Error in clean_demographic_dfs"
     EDIT_ANIMAL_TYPES = "Error in edit_all_types"
     EDIT_ANIMAL_TYPE = "Error in edit_animal_type"
-
-class ExtractionErrors:
-    FETCHING_DATA_FROM_SOURCE = "Error fetching data from source"
-    ERROR_STATUS_CODE = "Error: Received status code"
-    READ_DATA_FN_ERROR = "Error processing results" 
 
 class DataSources(Enum):
     SHELTER_SONOMA = "https://data.sonomacounty.ca.gov/resource/924a-vesw.json?$select=id,type,breed,color,sex,date_of_birth,intake_date,outcome_date,intake_type,outcome_type"

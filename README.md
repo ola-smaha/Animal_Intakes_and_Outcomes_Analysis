@@ -86,56 +86,7 @@
   
 <br><br>
 
-### Report Screenshots
 
-| Home Page |
-| ----------|
-|![Home](./readme/powerbi_report/home_page.png) |
- 
-
-<br>
-
-| Overview |
-| ----------|
-|![Overview](./readme/powerbi_report/overview.png) | 
-
-
- <br> 
-  
-| Adoption Analysis |
-| ----------|
-|![Adoption Analysis](./readme/powerbi_report/adoption_analysis.png) | 
-
-
-  
-<br>
-
-| Socio-economic Analysis |
-| ------------------------|
-|![Socio-economic](./readme/powerbi_report/socio_economic_analysis.png) | 
-
-
-<br> 
-  
-
-| Summary Analysis |
-| -----------------|
-|![Summary](./readme/powerbi_report/summary_analysis.png) | 
-
-
-<br> 
-  
-| Available for Adoption |
-| -----------------------|
-|![for adoption](./readme/powerbi_report/available_for_adoption.png) | 
-
-
-<br>
-
-
-| Toolbox for Overview Page | Toolbox for Adoption Analysis Page | Toolbox for Socio-economic Analysis Page |
-| ---------| ---------| ---------|
-|![Overview](./readme/powerbi_report/overview_toolbox.png) |![adoption](./readme/powerbi_report/intake_toolbox.png)|![socio](./readme/powerbi_report/outcome_toolbox.png)|
 <!-- Tech stacks -->
 
 <a  name="stacks"></a>
@@ -143,24 +94,6 @@
 
 <br>
 Animal Intakes and Outcomes Analysis is created using the following technologies:
-
-1. **SQL:** Used to create schema tables.
-2. **Python:** Used to code data extraction and cleaning processes and ETL steps (Prehook, Hook, Posthook) using Python modules and libraries like pandas, requests, numpy, BeautifulSoup, psycopg2, openai, concurrent.futures, enum, etc.
-3. **SoQL (Socrata Query Language):** Used to query SODA API endpoint links and retrieve data directly from the source based on a date condition.
-4. **PowerBI:** Used to create an interactive report through visuals and DAX.
-
-
-  
-<br>
-
-<br>
-
-  
-
-<!-- Implementation -->
-
-<a  name="Demo"  ></a>
-<img  src="./readme/title4.svg" id="#demo"/>
 
 ## Frontend
 
@@ -185,6 +118,87 @@ A central dashboard where viewers can view:
 
 
 
+  
+<br>
+
+<br>
+
+  
+
+<!-- Implementation -->
+
+<a  name="Demo"  ></a>
+<img  src="./readme/title4.svg" id="#demo"/>
+
+
+  
+
+<br>
+
+  
+
+
+### Report Screenshots
+
+| Home Page |
+| ----------|
+|![Home](./readme/powerbi_report/gifs/home.gif) |
+ 
+
+<br>
+
+| Overview |
+| ----------|
+|![Overview](./readme/powerbi_report/gifs/overview.gif) | 
+
+
+ <br> 
+  
+| Adoption Analysis |
+| ----------|
+|![Adoption Analysis](./readme/powerbi_report/gifs/adoption.gif) | 
+
+
+  
+<br>
+
+| Socio-economic Analysis |
+| ------------------------|
+|![Socio-economic](./readme/powerbi_report/gifs/socio-economic.gif) | 
+
+
+<br> 
+  
+
+| Summary Analysis |
+| -----------------|
+|![Summary](./readme/powerbi_report/pics/summary_analysis.png) | 
+
+
+<br> 
+  
+| Available for Adoption |
+| -----------------------|
+|![for adoption](./readme/powerbi_report/pics/available_for_adoption.png) | 
+
+
+
+<br>
+
+#### Toolboxes
+
+| In Overview Page | In Adoption Analysis Page | In Socio-economic Analysis Page |
+| ---------| ---------| ---------|
+|![Overview](./readme/powerbi_report/pics/overview_toolbox.png) |![adoption](./readme/powerbi_report/pics/intake_toolbox.png)|![socio](./readme/powerbi_report/pics/outcome_toolbox.png)|
+
+<br>
+
+| Report Video Recap |
+| -------------------|
+|![video](./readme/powerbi_report/videos/powerbi_video.mkv) |
+
+
+<br><br>
 <br><br>
 
 
@@ -239,4 +253,4 @@ git clone https://github.com/ola-smaha/FSD_Final_Project_2023.git
 
 You should be able to check the app.log file to see the ETL work.
 
-As for the dashboard access: Please use this link "public powerbi link" to access your data.
+As for the dashboard access: Please use [this link](https://app.powerbi.com/view?r=eyJrIjoiYzQwOTIwYmItZGQzOS00ZWVmLWI2YjYtYjQyODRjMGFmYjFiIiwidCI6IjJhZDk2OTM0LTQzZTUtNDFjMi05NzYxLWYzMzVmZTIxNGNjMyIsImMiOjl9) to access your data.

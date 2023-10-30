@@ -197,6 +197,10 @@ A central dashboard where viewers can view:
 | -------------------|
 |[![video](https://github.com/ola-smaha/Animal_Intakes_and_Outcomes_Analysis/blob/main/readme/powerbi_report/videos/powerbi.mp4)] |
 
+https://github.com/ola-smaha/Animal_Intakes_and_Outcomes_Analysis/blob/main/readme/powerbi_report/videos/powerbi.mp4
+
+
+
 
 <br><br>
 <br><br>

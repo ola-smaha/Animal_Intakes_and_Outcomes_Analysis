@@ -9,14 +9,18 @@ from bs4 import BeautifulSoup
 
 
 def get_data_columns(sources):
-    shelter_sources = [source for source in sources if source.name.startswith('SHELTER')]
     data = {}
-    for source in shelter_sources:
-        response = requests.get(source.value,params={'$limit': 1})
-        result = (source.name.lower(), pd.DataFrame(response.json()))
-        columns = result[1].columns
-        data[result[0]] = columns.tolist()
-    return data
+    try:
+        shelter_sources = [source for source in sources if source.name.startswith('SHELTER')]
+        for source in shelter_sources:
+            response = requests.get(source.value,params={'$limit': 1})
+            result = (source.name.lower(), pd.DataFrame(response.json()))
+            columns = result[1].columns
+            data[result[0]] = columns.tolist()
+    except Exception as e:
+        log_error_msg(ExtractionErrors.GET_DATA_COLUMNS.value, str(e))
+    finally:
+        return data
 
 def fetch_data(source, limit, etl_date):
     result = None
@@ -55,21 +59,26 @@ def fetch_data(source, limit, etl_date):
 
 
 def web_scrape_data(soup):
-    table = soup.find_all('table')[0]
-    columns = table.find_all('th')
-    columns = [column.text.strip() for column in columns]
-    df = pd.DataFrame(columns=columns)
-    rows = table.find_all('tr')
-    for row in rows[1:]:
-        row_data = row.find_all('td')
-        single_row_data = [data.text.strip() for data in row_data]
-        length = len(df)
-        df.loc[length] = single_row_data
-    df.drop(df.columns[2], axis = 1, inplace=True)
-    df.iloc[:,0] = [i.replace('*','').strip() for i in df.iloc[:,0]]
-    df.iloc[:,1] = [i.replace(',','').strip() for i in df.iloc[:,1]]
-    df = df.astype(np.int64)
-    return df
+    df = pd.DataFrame()
+    try:
+        table = soup.find_all('table')[0]
+        columns = table.find_all('th')
+        columns = [column.text.strip() for column in columns]
+        df = pd.DataFrame(columns=columns)
+        rows = table.find_all('tr')
+        for row in rows[1:]:
+            row_data = row.find_all('td')
+            single_row_data = [data.text.strip() for data in row_data]
+            length = len(df)
+            df.loc[length] = single_row_data
+        df.drop(df.columns[2], axis = 1, inplace=True)
+        df.iloc[:,0] = [i.replace('*','').strip() for i in df.iloc[:,0]]
+        df.iloc[:,1] = [i.replace(',','').strip() for i in df.iloc[:,1]]
+        df = df.astype(np.int64)
+    except Exception as e:
+        log_error_msg(ExtractionErrors.WEBSCRAPE_DATA_ERROR.value,str(e))
+    finally:
+        return df
 
 
 def readData(etl_date = None, limit = 1): 

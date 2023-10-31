@@ -138,7 +138,7 @@ A central dashboard where viewers can view:
   
 
 
-### Report Screenshots
+### Report Screenshots & GIFs
 
 | Home Page |
 | ----------|

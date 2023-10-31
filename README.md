@@ -113,7 +113,7 @@ A central dashboard where viewers can view:
 ## Backend
 
 1. API Integration and Web scraping.
-2. ETL Pipeline: using python and pandas, raw data is extracted, transformed into a usable format and loaded into postgreSQL database.
+2. ETL Pipeline: using Python and Pandas, raw data is extracted, transformed into a usable format and loaded into PostgreSQL database.
 3. Database: Schema Design - Indexing - Data Integrity - Backup & Recovery. 
 
 

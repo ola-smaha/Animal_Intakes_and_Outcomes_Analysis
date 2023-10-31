@@ -42,21 +42,21 @@
 
   
 1. As a Data Engineer:<br>
-	I want to automatically scrape various economic indicators from reputable sources so that our dataset is always up-to-date.<br>
-	I want to integrate different data sources seamlessly.
+	- I want to automatically scrape various economic indicators from reputable sources so that our dataset is always up-to-date.<br>
+	- I want to integrate different data sources seamlessly.
 	Ensure fault tolerance in our data pipelines, so that potential failures don't interrupt our analyses.
 2. As an Analyst:<br>
-	I want to query the database.<br>
-	I want to visualize the data using Power BI.
+	- I want to query the database.<br>
+	- I want to visualize the data using Power BI.
 3. As a Pet Adopter or a Foster Family:<br>
-	I want to access a dataset that provides information on specific animals availability, behaviors, and characteristics to ensure proper care.<br>
-	I want to know about available animals for fostering and temporary care.
+	- I want to access a dataset that provides information on specific animals availability, behaviors, and characteristics to ensure proper care.<br>
+	- I want to know about available animals for fostering and temporary care.
 4. As a Regional Animal Welfare Organization:<br>
-	I want to oversee and coordinate animal adoption processes and welfare efforts at a regional level.<br>
-	I want to assess the overall welfare of animals in the region and to allocate resources effectively.
+	- I want to oversee and coordinate animal adoption processes and welfare efforts at a regional level.<br>
+	- I want to assess the overall welfare of animals in the region and to allocate resources effectively.
 5. As a Veterinarian:<br>
-	I want to understand trends in animal deaths and euthanasia rates.<br>
-	I want to coordinate with shelters or rescue organizations.
+	- I want to understand trends in animal deaths and euthanasia rates.<br>
+	- I want to coordinate with shelters or rescue organizations.
 
 
 <br><br>

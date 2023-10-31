@@ -193,14 +193,14 @@ A central dashboard where viewers can view:
 
 <br>
 
-| Report Video Recap |
-| -------------------|
-|[![video](https://github.com/ola-smaha/Animal_Intakes_and_Outcomes_Analysis/assets/141483688/74b3c4cd-a27a-4345-bbca-5833a44c414d)] |
+| Report Recap Video|
+| ---------------|
+
+https://github.com/ola-smaha/Animal_Intakes_and_Outcomes_Analysis/assets/141483688/6ba970f0-0443-4e0b-a4ee-a5b3d5d6134a
 
 
 <br><br>
 <br><br>
-
 
 
 <!-- How to run -->
@@ -235,7 +235,7 @@ A central dashboard where viewers can view:
 
 ```sh
 
-git clone https://github.com/ola-smaha/FSD_Final_Project_2023.git
+git clone https://github.com/ola-smaha/Animal_Intakes_and_Outcomes_Analysis.git
 
 ```
 
@@ -253,4 +253,4 @@ git clone https://github.com/ola-smaha/FSD_Final_Project_2023.git
 
 You should be able to check the app.log file to see the ETL work.
 
-As for the dashboard access: Please use [this link](https://app.powerbi.com/view?r=eyJrIjoiYzQwOTIwYmItZGQzOS00ZWVmLWI2YjYtYjQyODRjMGFmYjFiIiwidCI6IjJhZDk2OTM0LTQzZTUtNDFjMi05NzYxLWYzMzVmZTIxNGNjMyIsImMiOjl9) to access your data.
+As for the dashboard access: Please use [this link](https://app.powerbi.com/view?r=eyJrIjoiNzg5OTZjNWUtNGY1OS00MTFjLTliZjEtM2Q4OWFmYzk0ZTQwIiwidCI6IjJhZDk2OTM0LTQzZTUtNDFjMi05NzYxLWYzMzVmZTIxNGNjMyIsImMiOjl9) to access your data.
